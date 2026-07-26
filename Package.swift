@@ -4,29 +4,38 @@
 import PackageDescription
 
 let package = Package(
-    name: "AuraDS",
+    name: "Aura",
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(
-            name: "AuraDS",
-            targets: ["AuraDS"]
-        ),
+        .library(name: "AuraDS", targets: ["AuraDS"]),
+        .library(name: "AuraSDUI", targets: ["AuraSDUI"]),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "AuraDS",
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency"),
-            ],
+            ]
+        ),
+        .target(
+            name: "AuraSDUI",
+            dependencies: ["AuraDS"],
+            swiftSettings: [
+                .enableUpcomingFeature("ApproachableConcurrency"),
+            ]
         ),
         .testTarget(
             name: "AuraDSTests",
             dependencies: ["AuraDS"],
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency"),
-            ],
+            ]
+        ),
+        .testTarget(
+            name: "AuraSDUITests",
+            dependencies: ["AuraSDUI"],
+            swiftSettings: [
+                .enableUpcomingFeature("ApproachableConcurrency"),
+            ]
         ),
     ]
 )
