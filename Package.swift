@@ -32,7 +32,7 @@ let package = Package(
         ),
         .testTarget(
             name: "AuraSDUITests",
-            dependencies: ["AuraSDUI"],
+            dependencies: ["AuraSDUI", "AuraDS"],
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency"),
             ]
