@@ -6,19 +6,34 @@ import PackageDescription
 let package = Package(
     name: "Aura",
     products: [
+        .library(name: "AuraKernel", targets: ["AuraKernel"]),
         .library(name: "AuraDS", targets: ["AuraDS"]),
         .library(name: "AuraSDUI", targets: ["AuraSDUI"]),
     ],
     targets: [
         .target(
+            name: "AuraKernel",
+            swiftSettings: [
+                .enableUpcomingFeature("ApproachableConcurrency"),
+            ]
+        ),
+        .target(
             name: "AuraDS",
+            dependencies: ["AuraKernel"],
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency"),
             ]
         ),
         .target(
             name: "AuraSDUI",
-            dependencies: ["AuraDS"],
+            dependencies: ["AuraDS", "AuraKernel"],
+            swiftSettings: [
+                .enableUpcomingFeature("ApproachableConcurrency"),
+            ]
+        ),
+        .testTarget(
+            name: "AuraKernelTests",
+            dependencies: ["AuraKernel"],
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency"),
             ]

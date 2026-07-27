@@ -42,6 +42,7 @@ tuist generate
 
 ```
 Aura/
+├── Docs/ADRs/              # Architecture Decision Records
 ├── Package.swift          # SPM source of truth
 ├── Sources/
 │   ├── AuraDS/            # Design System
