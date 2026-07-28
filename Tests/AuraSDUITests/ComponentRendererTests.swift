@@ -46,16 +46,14 @@ struct ComponentRendererTests {
     func renderHeading() {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
         let component = SUIComponent.heading(AuraSDUIHeading(content: "Hello", theme: .primary))
-        let view = renderer.render(component)
-        #expect(view is AnyView)
+        _ = renderer.render(component)
     }
 
     @Test("renders text without crashing")
     func renderText() {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
         let component = SUIComponent.text(AuraSDUIText(content: "Body", theme: .secondary))
-        let view = renderer.render(component)
-        #expect(view is AnyView)
+        _ = renderer.render(component)
     }
 
     @Test("renders button without crashing")
@@ -63,23 +61,20 @@ struct ComponentRendererTests {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
         let action = AuraComponentAction.navigate("home")
         let component = SUIComponent.button(AuraSDUIButton(label: "Go", theme: .primary, action: action))
-        let view = renderer.render(component)
-        #expect(view is AnyView)
+        _ = renderer.render(component)
     }
 
     @Test("renders spacer without crashing")
     func renderSpacer() {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
-        let view = renderer.render(.spacer)
-        #expect(view is AnyView)
+        _ = renderer.render(.spacer)
     }
 
     @Test("renders unknown without crashing")
     func renderUnknown() {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
         let raw = AuraComponent(type: .image, content: "img.png", theme: nil, action: nil, children: nil)
-        let view = renderer.render(.unknown(raw))
-        #expect(view is AnyView)
+        _ = renderer.render(.unknown(raw))
     }
 
     @Test("renders container with children without crashing")
@@ -91,8 +86,7 @@ struct ComponentRendererTests {
             .spacer,
         ]
         let component = SUIComponent.container(theme: .primary, children: children)
-        let view = renderer.render(component)
-        #expect(view is AnyView)
+        _ = renderer.render(component)
     }
 
     @Test("renders deeply nested containers without crashing")
@@ -105,8 +99,7 @@ struct ComponentRendererTests {
             .container(theme: .primary, children: inner),
         ]
         let component = SUIComponent.container(theme: .primary, children: outer)
-        let view = renderer.render(component)
-        #expect(view is AnyView)
+        _ = renderer.render(component)
     }
 
     // MARK: - Action Tests
@@ -127,7 +120,7 @@ struct ComponentRendererTests {
         // Render doesn't trigger the action — it creates a Button view.
         // The action is only triggered when the Button is tapped.
         // We verify the renderer doesn't crash.
-        let _ = renderer.render(component)
+        _ = renderer.render(component)
     }
 
     // MARK: - Theme Resolution Tests
@@ -136,9 +129,7 @@ struct ComponentRendererTests {
     func headingStyleFromTheme() {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
         let component = SUIComponent.heading(AuraSDUIHeading(content: "Hello", theme: .primary))
-        let _ = renderer.render(component)
-        // If the theme didn't have .primary for heading, it would use .empty
-        // and the textColor would be nil. We verify the theme has it.
+        _ = renderer.render(component)
         #expect(testTheme.heading[.primary]?.textColor == "color.text.primary")
     }
 
@@ -147,7 +138,7 @@ struct ComponentRendererTests {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
         let action = AuraComponentAction.navigate("x")
         let component = SUIComponent.button(AuraSDUIButton(label: "Go", theme: .primary, action: action))
-        let _ = renderer.render(component)
+        _ = renderer.render(component)
         #expect(testTheme.button[.primary]?.backgroundColor == "color.control.primary")
     }
 
@@ -155,17 +146,15 @@ struct ComponentRendererTests {
     func containerStyleFromTheme() {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
         let component = SUIComponent.container(theme: .primary, children: [])
-        let _ = renderer.render(component)
+        _ = renderer.render(component)
         #expect(testTheme.container[.primary]?.cornerRadius == 12)
     }
 
     @Test("falls back to empty style for missing theme")
     func missingThemeFallback() {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
-        // .ghost is not in testTheme.heading
         let component = SUIComponent.heading(AuraSDUIHeading(content: "Hello", theme: .ghost))
-        let _ = renderer.render(component)
-        // Should not crash — uses .empty
+        _ = renderer.render(component)
     }
 
     // MARK: - Sendable Conformance
@@ -173,10 +162,8 @@ struct ComponentRendererTests {
     @Test("renderer is Sendable")
     func isSendable() {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
-        // Verify it can be sent across concurrency boundaries
         Task {
-            let view = renderer.render(.spacer)
-            #expect(view is AnyView)
+            _ = renderer.render(.spacer)
         }
     }
 }
