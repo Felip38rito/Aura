@@ -35,6 +35,26 @@ public struct AuraTheme: Decodable, Sendable {
         self.image = image
     }
 
+    // MARK: - Decodable
+
+    enum CodingKeys: String, CodingKey {
+        case heading, text, button, container, image
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.heading = try container.decodeIfPresent([String: ComponentStyle].self, forKey: .heading)?
+            .compactMapKeys { AuraComponentTheme(rawValue: $0) } ?? [:]
+        self.text = try container.decodeIfPresent([String: ComponentStyle].self, forKey: .text)?
+            .compactMapKeys { AuraComponentTheme(rawValue: $0) } ?? [:]
+        self.button = try container.decodeIfPresent([String: ComponentStyle].self, forKey: .button)?
+            .compactMapKeys { AuraComponentTheme(rawValue: $0) } ?? [:]
+        self.container = try container.decodeIfPresent([String: ComponentStyle].self, forKey: .container)?
+            .compactMapKeys { AuraComponentTheme(rawValue: $0) } ?? [:]
+        self.image = try container.decodeIfPresent([String: ComponentStyle].self, forKey: .image)?
+            .compactMapKeys { AuraComponentTheme(rawValue: $0) } ?? [:]
+    }
+
     // MARK: - Default Theme
 
     /// The built-in default theme. Covers all standard component + theme combinations.
