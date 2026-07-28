@@ -22,7 +22,7 @@ extension SUIComponent: Decodable {
         switch type {
         case .heading:
             let content = try container.decode(String.self, forKey: .content)
-            let theme = try container.decodeIfPresent(AuraComponentTheme.self, forKey: .theme) ?? .primary
+            let theme: AuraComponentTheme = try container.decodeIfPresent(AuraComponentTheme.self, forKey: .theme) ?? .primary
             self = .heading(AuraSDUIHeading(content: content, theme: theme))
 
         case .text:
