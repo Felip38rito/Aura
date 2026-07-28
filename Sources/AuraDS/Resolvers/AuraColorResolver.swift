@@ -1,69 +1,55 @@
-import SwiftUI
+import CoreGraphics
+import Foundation
 
-/// Resolves `AuraColorToken` into a SwiftUI `Color`.
+/// Resolves `AuraColorToken` into a platform-agnostic `CGColor`.
 ///
-/// Create a custom resolver to support different palettes (light/dark, brand, etc.):
-/// ```swift
-/// let customResolver = AuraColorResolver { token in
-///     switch token {
-///     case .textPrimary: Color("BrandTextPrimary")
-///     default: AuraColorResolver.default.resolve(token)
-///     }
-/// }
-/// ```
+/// Works with SwiftUI (`Color(cgColor:)`), UIKit (`UIColor(cgColor:)`),
+/// and AppKit (`NSColor(cgColor:)`).
 public struct AuraColorResolver: Sendable {
-    public let resolve: @Sendable (AuraColorToken) -> Color
+    public let resolve: @Sendable (AuraColorToken) -> CGColor
 
-    public init(resolve: @escaping @Sendable (AuraColorToken) -> Color) {
+    public init(resolve: @escaping @Sendable (AuraColorToken) -> CGColor) {
         self.resolve = resolve
     }
 
     public static let `default` = AuraColorResolver { token in
         switch token {
         // Text
-        case .textPrimary: Color.primary
-        case .textSecondary: Color.secondary
-        case .textTertiary: Color.gray
-        case .textDanger: Color.red
-        case .textSuccess: Color.green
-        case .textWarning: Color.orange
-        case .textInfo: Color.blue
-        case .textDisabled: Color.gray.opacity(0.5)
-        case .textOnPrimary: Color.white
-        case .textOnDark: Color.white
+        case .textPrimary: CGColor(gray: 0, alpha: 1)
+        case .textSecondary: CGColor(gray: 0.55, alpha: 1)
+        case .textTertiary: CGColor(gray: 0.7, alpha: 1)
+        case .textDanger: CGColor(srgbRed: 1, green: 0.23, blue: 0.19, alpha: 1)
+        case .textSuccess: CGColor(srgbRed: 0.2, green: 0.78, blue: 0.35, alpha: 1)
+        case .textWarning: CGColor(srgbRed: 1, green: 0.6, blue: 0, alpha: 1)
+        case .textInfo: CGColor(srgbRed: 0, green: 0.48, blue: 1, alpha: 1)
+        case .textDisabled: CGColor(gray: 0.7, alpha: 0.5)
+        case .textOnPrimary: CGColor(gray: 1, alpha: 1)
+        case .textOnDark: CGColor(gray: 1, alpha: 1)
 
         // Control
-        case .controlPrimary: Color.blue
-        case .controlPrimaryPressed: Color.blue.opacity(0.8)
-        case .controlSecondary: Color.gray.opacity(0.2)
-        case .controlDanger: Color.red
-        case .controlSuccess: Color.green
-        case .controlGhost: Color.clear
+        case .controlPrimary: CGColor(srgbRed: 0, green: 0.48, blue: 1, alpha: 1)
+        case .controlPrimaryPressed: CGColor(srgbRed: 0, green: 0.38, blue: 0.9, alpha: 1)
+        case .controlSecondary: CGColor(gray: 0.85, alpha: 1)
+        case .controlDanger: CGColor(srgbRed: 1, green: 0.23, blue: 0.19, alpha: 1)
+        case .controlSuccess: CGColor(srgbRed: 0.2, green: 0.78, blue: 0.35, alpha: 1)
+        case .controlGhost: CGColor(gray: 0, alpha: 0)
 
         // Surface
-        case .surfacePrimary: AuraColorResolver._surfacePrimary()
-        case .surfaceSecondary: AuraColorResolver._surfaceSecondary()
-        case .surfaceTertiary: AuraColorResolver._surfaceTertiary()
-        case .backgroundPrimary: AuraColorResolver._backgroundPrimary()
-        case .backgroundSecondary: AuraColorResolver._backgroundSecondary()
+        case .surfacePrimary: CGColor(gray: 1, alpha: 1)
+        case .surfaceSecondary: CGColor(srgbRed: 0.95, green: 0.95, blue: 0.97, alpha: 1)
+        case .surfaceTertiary: CGColor(srgbRed: 0.92, green: 0.92, blue: 0.95, alpha: 1)
+        case .backgroundPrimary: CGColor(gray: 1, alpha: 1)
+        case .backgroundSecondary: CGColor(srgbRed: 0.95, green: 0.95, blue: 0.97, alpha: 1)
 
         // Border
-        case .borderPrimary: Color.gray.opacity(0.3)
-        case .borderSecondary: Color.gray.opacity(0.15)
-        case .borderDanger: Color.red.opacity(0.5)
+        case .borderPrimary: CGColor(gray: 0.8, alpha: 1)
+        case .borderSecondary: CGColor(gray: 0.9, alpha: 1)
+        case .borderDanger: CGColor(srgbRed: 1, green: 0.6, blue: 0.6, alpha: 1)
 
         // Neutral
-        case .neutralWhite: Color.white
-        case .neutralBlack: Color.black
-        case .neutralClear: Color.clear
+        case .neutralWhite: CGColor(gray: 1, alpha: 1)
+        case .neutralBlack: CGColor(gray: 0, alpha: 1)
+        case .neutralClear: CGColor(gray: 0, alpha: 0)
         }
     }
-
-    // MARK: - Platform-specific Colors
-
-    private static func _surfacePrimary() -> Color { Color(.sRGB, red: 1, green: 1, blue: 1, opacity: 1) }
-    private static func _surfaceSecondary() -> Color { Color(.sRGB, red: 0.95, green: 0.95, blue: 0.97, opacity: 1) }
-    private static func _surfaceTertiary() -> Color { Color(.sRGB, red: 0.92, green: 0.92, blue: 0.95, opacity: 1) }
-    private static func _backgroundPrimary() -> Color { Color(.sRGB, red: 1, green: 1, blue: 1, opacity: 1) }
-    private static func _backgroundSecondary() -> Color { Color(.sRGB, red: 0.95, green: 0.95, blue: 0.97, opacity: 1) }
 }

@@ -24,12 +24,34 @@ public struct AuraButton: View {
     public var body: some View {
         Button(action: action) {
             Text(label)
-                .font(style.font.map { fontResolver.resolve(AuraFontToken(rawValue: $0) ?? .button) } ?? fontResolver.resolve(.button))
-                .foregroundColor(style.textColor.map { colorResolver.resolve(AuraColorToken(rawValue: $0) ?? .textPrimary) } ?? colorResolver.resolve(.textOnPrimary))
-                .padding(style.padding.map { spacingResolver.resolve(AuraSpacingToken(rawValue: $0) ?? .md) } ?? spacingResolver.resolve(.md))
-                .background(style.backgroundColor.map { colorResolver.resolve(AuraColorToken(rawValue: $0) ?? .controlPrimary) } ?? colorResolver.resolve(.controlPrimary))
+                .font(resolvedFont)
+                .foregroundColor(resolvedTextColor)
+                .padding(resolvedPadding)
+                .background(resolvedBackground)
                 .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius ?? 8))
         }
         .buttonStyle(.plain)
+    }
+
+    // MARK: - Resolved Values
+
+    private var resolvedFont: Font {
+        guard let token = style.font else { return fontResolver.resolve(.button).auraFont }
+        return fontResolver.resolve(AuraFontToken(rawValue: token) ?? .button).auraFont
+    }
+
+    private var resolvedTextColor: Color {
+        guard let token = style.textColor else { return colorResolver.resolve(.textOnPrimary).auraColor }
+        return colorResolver.resolve(AuraColorToken(rawValue: token) ?? .textOnPrimary).auraColor
+    }
+
+    private var resolvedPadding: CGFloat {
+        guard let token = style.padding else { return spacingResolver.resolve(.md) }
+        return spacingResolver.resolve(AuraSpacingToken(rawValue: token) ?? .md)
+    }
+
+    private var resolvedBackground: Color {
+        guard let token = style.backgroundColor else { return colorResolver.resolve(.controlPrimary).auraColor }
+        return colorResolver.resolve(AuraColorToken(rawValue: token) ?? .controlPrimary).auraColor
     }
 }

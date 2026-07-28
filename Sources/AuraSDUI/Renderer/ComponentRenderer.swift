@@ -40,12 +40,8 @@ public struct ComponentRenderer: Sendable {
                         render(child)
                     }
                 }
-                .padding(style.padding.map {
-                    CGFloat(AuraSpacingResolver.default.resolve(AuraSpacingToken(rawValue: $0) ?? .md))
-                } ?? 0)
-                .background(style.backgroundColor.map {
-                    AuraColorResolver.default.resolve(AuraColorToken(rawValue: $0) ?? .surfacePrimary)
-                } ?? Color.clear)
+                .padding(resolvePadding(style.padding))
+                .background(resolveBackground(style.backgroundColor))
                 .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius ?? 0))
             )
 
@@ -55,5 +51,17 @@ public struct ComponentRenderer: Sendable {
         case .unknown:
             return AnyView(EmptyView())
         }
+    }
+
+    // MARK: - Resolution Helpers
+
+    private func resolvePadding(_ token: String?) -> CGFloat {
+        guard let token else { return 0 }
+        return AuraSpacingResolver.default.resolve(AuraSpacingToken(rawValue: token) ?? .md)
+    }
+
+    private func resolveBackground(_ token: String?) -> Color {
+        guard let token else { return .clear }
+        return AuraColorResolver.default.resolve(AuraColorToken(rawValue: token) ?? .surfacePrimary).auraColor
     }
 }

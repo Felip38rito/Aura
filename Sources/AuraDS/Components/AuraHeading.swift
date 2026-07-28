@@ -16,8 +16,25 @@ public struct AuraHeading: View {
 
     public var body: some View {
         Text(content)
-            .font(style.font.map { fontResolver.resolve(AuraFontToken(rawValue: $0) ?? .heading1) } ?? fontResolver.resolve(.heading1))
-            .foregroundColor(style.textColor.map { colorResolver.resolve(AuraColorToken(rawValue: $0) ?? .textPrimary) } ?? colorResolver.resolve(.textPrimary))
-            .padding(.bottom, style.margin.map { spacingResolver.resolve(AuraSpacingToken(rawValue: $0) ?? .md) } ?? spacingResolver.resolve(.md))
+            .font(resolvedFont)
+            .foregroundColor(resolvedColor)
+            .padding(.bottom, resolvedMargin)
+    }
+
+    // MARK: - Resolved Values
+
+    private var resolvedFont: Font {
+        guard let token = style.font else { return fontResolver.resolve(.heading1).auraFont }
+        return fontResolver.resolve(AuraFontToken(rawValue: token) ?? .heading1).auraFont
+    }
+
+    private var resolvedColor: Color {
+        guard let token = style.textColor else { return colorResolver.resolve(.textPrimary).auraColor }
+        return colorResolver.resolve(AuraColorToken(rawValue: token) ?? .textPrimary).auraColor
+    }
+
+    private var resolvedMargin: CGFloat {
+        guard let token = style.margin else { return spacingResolver.resolve(.md) }
+        return spacingResolver.resolve(AuraSpacingToken(rawValue: token) ?? .md)
     }
 }

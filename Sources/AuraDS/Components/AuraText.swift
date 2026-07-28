@@ -15,7 +15,19 @@ public struct AuraText: View {
 
     public var body: some View {
         Text(content)
-            .font(style.font.map { fontResolver.resolve(AuraFontToken(rawValue: $0) ?? .body) } ?? fontResolver.resolve(.body))
-            .foregroundColor(style.textColor.map { colorResolver.resolve(AuraColorToken(rawValue: $0) ?? .textPrimary) } ?? colorResolver.resolve(.textPrimary))
+            .font(resolvedFont)
+            .foregroundColor(resolvedColor)
+    }
+
+    // MARK: - Resolved Values
+
+    private var resolvedFont: Font {
+        guard let token = style.font else { return fontResolver.resolve(.body).auraFont }
+        return fontResolver.resolve(AuraFontToken(rawValue: token) ?? .body).auraFont
+    }
+
+    private var resolvedColor: Color {
+        guard let token = style.textColor else { return colorResolver.resolve(.textPrimary).auraColor }
+        return colorResolver.resolve(AuraColorToken(rawValue: token) ?? .textPrimary).auraColor
     }
 }
