@@ -25,6 +25,20 @@ public struct AuraComponent: Decodable, Sendable {
         case children
     }
 
+    public init(
+        type: AuraComponentType,
+        content: AuraComponentContent? = nil,
+        theme: AuraComponentTheme? = nil,
+        action: AuraComponentAction? = nil,
+        children: [AuraComponent]? = nil
+    ) {
+        self.type = type
+        self.content = content
+        self.theme = theme
+        self.action = action
+        self.children = children
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.type = try container.decode(AuraComponentType.self, forKey: .type)

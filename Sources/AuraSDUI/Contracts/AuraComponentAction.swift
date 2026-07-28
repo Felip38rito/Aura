@@ -6,7 +6,7 @@ import Foundation
 /// ```json
 /// { "type": "deepLink", "value": "aura://profile/123" }
 /// ```
-public enum AuraComponentAction: Decodable, Sendable {
+public enum AuraComponentAction: Decodable, Equatable, Sendable {
     case deepLink(URL)
     case navigate(String)
     case openURL(URL)
