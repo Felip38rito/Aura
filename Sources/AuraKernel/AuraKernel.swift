@@ -30,7 +30,7 @@ open class AuraKernel: NSObject {
 
     /// The shared kernel instance. Set automatically on first `boot()`.
     public static var shared: AuraKernel {
-        guard let instance = _shared else {
+        guard let instance: AuraKernel = _shared else {
             fatalError(
                 "AuraKernel.shared accessed before boot(). "
                 + "Call boot() in your SceneDelegate or AppDelegate initializer."

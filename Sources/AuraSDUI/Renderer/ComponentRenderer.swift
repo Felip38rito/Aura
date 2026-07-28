@@ -6,6 +6,7 @@ import AuraDS
 /// The renderer uses the injected `AuraTheme` and resolvers to style each component.
 /// It does **not** know about actions — it calls the `onAction` closure when a
 /// button is tapped, leaving the action handling to the app.
+@MainActor
 public struct ComponentRenderer: Sendable {
     public let theme: AuraTheme
     public let onAction: @Sendable (AuraComponentAction) -> Void

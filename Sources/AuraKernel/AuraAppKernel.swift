@@ -25,7 +25,7 @@ open class AuraAppKernel: AuraKernel, UIApplicationDelegate {
 
     // MARK: - UIApplicationDelegate Forwarding
 
-    @objc open func application(
+    open func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
@@ -38,37 +38,37 @@ open class AuraAppKernel: AuraKernel, UIApplicationDelegate {
         return result
     }
 
-    @objc open func applicationDidBecomeActive(_ application: UIApplication) {
+    open func applicationDidBecomeActive(_ application: UIApplication) {
         for plugin in pluginList {
             plugin.applicationDidBecomeActive(application)
         }
     }
 
-    @objc open func applicationWillResignActive(_ application: UIApplication) {
+    open func applicationWillResignActive(_ application: UIApplication) {
         for plugin in pluginList {
             plugin.applicationWillResignActive(application)
         }
     }
 
-    @objc open func applicationDidEnterBackground(_ application: UIApplication) {
+    open func applicationDidEnterBackground(_ application: UIApplication) {
         for plugin in pluginList {
             plugin.applicationDidEnterBackground(application)
         }
     }
 
-    @objc open func applicationWillEnterForeground(_ application: UIApplication) {
+    open func applicationWillEnterForeground(_ application: UIApplication) {
         for plugin in pluginList {
             plugin.applicationWillEnterForeground(application)
         }
     }
 
-    @objc open func applicationWillTerminate(_ application: UIApplication) {
+    open func applicationWillTerminate(_ application: UIApplication) {
         for plugin in pluginList {
             plugin.applicationWillTerminate(application)
         }
     }
 
-    @objc open func application(
+    open func application(
         _ application: UIApplication,
         open url: URL,
         options: [UIApplication.OpenURLOptionsKey: Any]
@@ -82,7 +82,7 @@ open class AuraAppKernel: AuraKernel, UIApplicationDelegate {
         return result
     }
 
-    @objc open func application(
+    open func application(
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
@@ -91,7 +91,7 @@ open class AuraAppKernel: AuraKernel, UIApplicationDelegate {
         }
     }
 
-    @objc open func application(
+    open func application(
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
@@ -100,7 +100,7 @@ open class AuraAppKernel: AuraKernel, UIApplicationDelegate {
         }
     }
 
-    @objc open func application(
+    open func application(
         _ application: UIApplication,
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
