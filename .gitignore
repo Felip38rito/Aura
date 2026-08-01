@@ -13,3 +13,5 @@ DerivedData/
 /Tuist/.build
 /Tuist/xcuserdata/
 /Tuist/xcshareddata/
+/Tuist/.swiftpm/
+/Tuist/Derived/
