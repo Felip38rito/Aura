@@ -50,7 +50,6 @@ public protocol AuraKernelPlugin: AnyObject {
 class AppDelegate: AuraKernel, UIApplicationDelegate {
     override init() {
         super.init()
-        register(NetworkingPlugin())
         register(DatabasePlugin())
         register(DeepLinkPlugin())
         boot()

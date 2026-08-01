@@ -14,7 +14,6 @@ import UIKit
 /// class SceneDelegate: AuraSceneKernel {
 ///     override init() {
 ///         super.init()
-///         register(NetworkingPlugin())
 ///         register(DeepLinkPlugin())
 ///         try! boot()
 ///     }

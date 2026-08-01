@@ -15,7 +15,6 @@ import Foundation
 /// class SceneDelegate: AuraSceneKernel {
 ///     override init() {
 ///         super.init()
-///         register(NetworkingPlugin())
 ///         register(DeepLinkPlugin())
 ///         try! boot()
 ///     }
