@@ -13,6 +13,7 @@ extension SUIComponent: Decodable {
         case theme
         case action
         case children
+        case altText
     }
 
     public init(from decoder: Decoder) throws {
@@ -45,9 +46,10 @@ extension SUIComponent: Decodable {
             self = .spacer
 
         case .image:
-            // Image support will be added in a future iteration
-            let raw = try AuraComponent(from: decoder)
-            self = .unknown(raw)
+            let source = try container.decode(String.self, forKey: .content)
+            let theme = try container.decodeIfPresent(AuraComponentTheme.self, forKey: .theme) ?? .primary
+            let altText = try container.decodeIfPresent(String.self, forKey: .altText)
+            self = .image(AuraSDUIImage(source: source, theme: theme, altText: altText))
         }
     }
 }

@@ -48,6 +48,30 @@ public struct ComponentRenderer: Sendable {
         case .spacer:
             return AnyView(Spacer())
 
+        case .image(let data):
+            let style = theme.image[data.theme] ?? .empty
+            return AnyView(
+                AsyncImage(url: URL(string: data.source)) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius ?? 0))
+                    case .failure:
+                        if let alt = data.altText {
+                            AuraText(content: alt, style: .empty)
+                        } else {
+                            Image(systemName: "photo").foregroundColor(.gray)
+                        }
+                    case .empty:
+                        ProgressView()
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+            )
+
         case .unknown:
             return AnyView(EmptyView())
         }

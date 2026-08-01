@@ -70,6 +70,20 @@ struct ComponentRendererTests {
         _ = renderer.render(.spacer)
     }
 
+    @Test("renders image without crashing")
+    func renderImage() {
+        let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
+        let component = SUIComponent.image(AuraSDUIImage(source: "https://example.com/img.png", theme: .primary))
+        _ = renderer.render(component)
+    }
+
+    @Test("renders image with alt text without crashing")
+    func renderImageWithAltText() {
+        let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })
+        let component = SUIComponent.image(AuraSDUIImage(source: "https://example.com/img.png", theme: .primary, altText: "Alt Text"))
+        _ = renderer.render(component)
+    }
+
     @Test("renders unknown without crashing")
     func renderUnknown() {
         let renderer = ComponentRenderer(theme: testTheme, onAction: { _ in })

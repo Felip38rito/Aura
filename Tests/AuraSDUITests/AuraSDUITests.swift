@@ -232,15 +232,18 @@ struct SUIComponentDecodingTests {
         #expect(text.content == "Deep")
     }
 
-    @Test("decodes image as unknown (not yet supported)")
-    func imageAsUnknown() throws {
-        let json = #"{"type": "image", "content": "https://example.com/img.png"}"#.data(using: .utf8)!
+    @Test("decodes image as typed component")
+    func imageDecoding() throws {
+        let json = #"{"type": "image", "content": "https://example.com/img.png", "theme": "primary", "altText": "Alt Text"}"#.data(using: .utf8)!
         let component = try JSONDecoder().decode(SUIComponent.self, from: json)
 
-        guard case .unknown = component else {
-            Issue.record("Expected unknown for image, got \(component)")
+        guard case .image(let data) = component else {
+            Issue.record("Expected image, got \(component)")
             return
         }
+        #expect(data.source == "https://example.com/img.png")
+        #expect(data.theme == .primary)
+        #expect(data.altText == "Alt Text")
     }
 
     @Test("throws on heading without content")

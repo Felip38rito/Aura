@@ -20,6 +20,7 @@ public indirect enum SUIComponent: Sendable {
     case heading(AuraSDUIHeading)
     case text(AuraSDUIText)
     case button(AuraSDUIButton)
+    case image(AuraSDUIImage)
     case container(theme: AuraComponentTheme, children: [SUIComponent])
     case spacer
     case unknown(AuraComponent)
