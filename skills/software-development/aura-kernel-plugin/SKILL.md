@@ -146,16 +146,16 @@ final class MyFeaturePluginTests {
 ### Plugin with Configuration
 
 ```swift
-public final class NetworkingPlugin: AuraKernelPlugin {
-    public let identifier = "networking"
-    private let baseURL: String
+public final class DatabasePlugin: AuraKernelPlugin {
+    public let identifier = "database"
+    private let databaseURL: URL
 
-    public init(baseURL: String) {
-        self.baseURL = baseURL
+    public init(databaseURL: URL) {
+        self.databaseURL = databaseURL
     }
 
     public func boot(kernel: AuraKernel) {
-        // Configure networking client with baseURL
+        // Configure database with databaseURL
     }
 }
 ```
