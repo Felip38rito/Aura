@@ -2,12 +2,12 @@ import Testing
 import Foundation
 @testable import AuraConnect
 
-@Suite("HTTPResponse Tests")
-struct HTTPResponseTests {
+@Suite("AuraHTTPResponse Tests")
+struct AuraHTTPResponseTests {
     @Test func testDecodeValidJSON() throws {
         let json = #"{"id": 1, "name": "Aura"}"#
         let data = json.data(using: .utf8)!
-        let response = HTTPResponse(statusCode: 200, body: data)
+        let response = AuraHTTPResponse(statusCode: 200, body: data)
 
         let user = try response.decode(MockUser.self)
         #expect(user == MockUser(id: 1, name: "Aura"))
@@ -16,7 +16,7 @@ struct HTTPResponseTests {
     @Test func testDecodeInvalidJSON() {
         let json = #"{"id": "invalid"}"#
         let data = json.data(using: .utf8)!
-        let response = HTTPResponse(statusCode: 200, body: data)
+        let response = AuraHTTPResponse(statusCode: 200, body: data)
 
         #expect(throws: (any Error).self) {
             try response.decode(MockUser.self)

@@ -34,24 +34,22 @@ private struct AddHeaderMiddleware: AuraConnectorMiddleware {
     let key: String
     let value: String
 
-    func before(request: HTTPRequest) async throws -> HTTPRequest {
-        var copy = request
-        var headers = copy.headers
+    func before(request: AuraHTTPRequest) async throws -> AuraHTTPRequest {
+        var headers = request.headers
         headers[key] = value
-        copy = HTTPRequest(method: copy.method, url: copy.url, headers: headers, body: copy.body)
-        return copy
+        return AuraHTTPRequest(method: request.method, url: request.url, headers: headers, body: request.body)
     }
 
-    func after(response: HTTPResponse) async throws -> HTTPResponse { response }
+    func after(response: AuraHTTPResponse) async throws -> AuraHTTPResponse { response }
 }
 
 private struct StatusMiddleware: AuraConnectorMiddleware {
     let newStatus: Int
 
-    func before(request: HTTPRequest) async throws -> HTTPRequest { request }
+    func before(request: AuraHTTPRequest) async throws -> AuraHTTPRequest { request }
 
-    func after(response: HTTPResponse) async throws -> HTTPResponse {
-        HTTPResponse(statusCode: newStatus, headers: response.headers, body: response.body)
+    func after(response: AuraHTTPResponse) async throws -> AuraHTTPResponse {
+        AuraHTTPResponse(statusCode: newStatus, headers: response.headers, body: response.body)
     }
 }
 
@@ -80,7 +78,7 @@ struct AuraURLSessionConnectorTests {
         defer { MockURLProtocol.requestHandler = nil }
 
         let connector = AuraURLSessionConnector(session: makeSession())
-        let request = HTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
+        let request = AuraHTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
 
         let response = try await connector.request(request)
 
@@ -95,7 +93,7 @@ struct AuraURLSessionConnectorTests {
         defer { MockURLProtocol.requestHandler = nil }
 
         let connector = AuraURLSessionConnector(session: makeSession())
-        let request = HTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
+        let request = AuraHTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
 
         await #expect(throws: URLError.self) {
             try await connector.request(request)
@@ -121,7 +119,7 @@ struct AuraURLSessionConnectorTests {
             session: makeSession(),
             middlewares: [middleware]
         )
-        let request = HTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
+        let request = AuraHTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
 
         let response = try await connector.request(request)
         #expect(response.statusCode == 200)
@@ -145,7 +143,7 @@ struct AuraURLSessionConnectorTests {
             session: makeSession(),
             middlewares: [middleware]
         )
-        let request = HTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
+        let request = AuraHTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
 
         let response = try await connector.request(request)
 
@@ -174,7 +172,7 @@ struct AuraURLSessionConnectorTests {
             session: makeSession(),
             middlewares: [m1, m2]
         )
-        let request = HTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
+        let request = AuraHTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
 
         let response = try await connector.request(request)
         #expect(response.statusCode == 200)

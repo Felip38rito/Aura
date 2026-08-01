@@ -2,13 +2,13 @@ import Testing
 import Foundation
 @testable import AuraConnect
 
-@Suite("RequestBuilder Tests")
-struct RequestBuilderTests {
+@Suite("AuraRequestBuilder Tests")
+struct AuraRequestBuilderTests {
     @Test func testFullConstruction() throws {
         let url = URL(string: "https://aura.ai")!
         let body = MockBody(key: "test", value: 123)
 
-        let request = try RequestBuilder()
+        let request = try AuraRequestBuilder()
             .with(method: .post)
             .with(url: url)
             .with(header: "X-Request-ID", value: "123")
@@ -23,7 +23,7 @@ struct RequestBuilderTests {
 
     @Test func testChainedWith() throws {
         let url = URL(string: "https://aura.ai")!
-        let builder = RequestBuilder()
+        let builder = AuraRequestBuilder()
             .with(method: .get)
             .with(url: url)
 
@@ -34,7 +34,7 @@ struct RequestBuilderTests {
 
     @Test func testBuildWithValidURL() throws {
         let url = URL(string: "https://aura.ai")!
-        let request = try RequestBuilder()
+        let request = try AuraRequestBuilder()
             .with(method: .get)
             .with(url: url)
             .build()
@@ -45,7 +45,7 @@ struct RequestBuilderTests {
     @Test func testBuildWithEncodableBody() throws {
         let url = URL(string: "https://aura.ai")!
         let body = MockBody(key: "test", value: 123)
-        let request = try RequestBuilder()
+        let request = try AuraRequestBuilder()
             .with(method: .post)
             .with(url: url)
             .with(body: body)
@@ -57,15 +57,15 @@ struct RequestBuilderTests {
 
     @Test func testMissingMethodThrows() {
         let url = URL(string: "https://aura.ai")!
-        let builder = RequestBuilder().with(url: url)
-        #expect(throws: RequestBuilder.RequestBuilderError.self) {
+        let builder = AuraRequestBuilder().with(url: url)
+        #expect(throws: AuraRequestBuilder.AuraRequestBuilderError.self) {
             try builder.build()
         }
     }
 
     @Test func testMissingURLThrows() {
-        let builder = RequestBuilder().with(method: .get)
-        #expect(throws: RequestBuilder.RequestBuilderError.self) {
+        let builder = AuraRequestBuilder().with(method: .get)
+        #expect(throws: AuraRequestBuilder.AuraRequestBuilderError.self) {
             try builder.build()
         }
     }

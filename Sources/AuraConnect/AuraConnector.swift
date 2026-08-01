@@ -1,6 +1,6 @@
 import Foundation
 
 public protocol AuraConnector: Sendable {
-    func request(_ request: HTTPRequest) async throws -> HTTPResponse
-    func download(_ request: HTTPRequest) async throws -> (URL, HTTPResponse)
+    func request(_ request: AuraHTTPRequest) async throws -> AuraHTTPResponse
+    func download(_ request: AuraHTTPRequest) async throws -> (URL, AuraHTTPResponse)
 }

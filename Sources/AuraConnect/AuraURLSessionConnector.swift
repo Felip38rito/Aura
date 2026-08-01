@@ -1,7 +1,7 @@
 import Foundation
 
 public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
-    public enum HTTPError: Error, Sendable {
+    public enum AuraHTTPError: Error, Sendable {
         case invalidResponse
         case networkError(Error)
     }
@@ -21,7 +21,7 @@ public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
         middlewares.append(middleware)
     }
 
-    public func request(_ request: HTTPRequest) async throws -> HTTPResponse {
+    public func request(_ request: AuraHTTPRequest) async throws -> AuraHTTPResponse {
         var currentRequest = request
         for middleware in middlewares {
             currentRequest = try await middleware.before(request: currentRequest)
@@ -31,10 +31,10 @@ public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
         let (data, response) = try await session.data(for: urlRequest)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw HTTPError.invalidResponse
+            throw AuraHTTPError.invalidResponse
         }
 
-        var currentResponse = HTTPResponse(
+        var currentResponse = AuraHTTPResponse(
             statusCode: httpResponse.statusCode,
             headers: httpResponse.allHeaderFields as? [String: String] ?? [:],
             body: data
@@ -47,7 +47,7 @@ public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
         return currentResponse
     }
 
-    public func download(_ request: HTTPRequest) async throws -> (URL, HTTPResponse) {
+    public func download(_ request: AuraHTTPRequest) async throws -> (URL, AuraHTTPResponse) {
         var currentRequest = request
         for middleware in middlewares {
             currentRequest = try await middleware.before(request: currentRequest)
@@ -57,10 +57,10 @@ public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
         let (localURL, response) = try await session.download(for: urlRequest)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw HTTPError.invalidResponse
+            throw AuraHTTPError.invalidResponse
         }
 
-        var currentResponse = HTTPResponse(
+        var currentResponse = AuraHTTPResponse(
             statusCode: httpResponse.statusCode,
             headers: httpResponse.allHeaderFields as? [String: String] ?? [:],
             body: try Data(contentsOf: localURL)
@@ -73,7 +73,7 @@ public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
         return (localURL, currentResponse)
     }
 
-    private func buildURLRequest(from request: HTTPRequest) throws -> URLRequest {
+    private func buildURLRequest(from request: AuraHTTPRequest) throws -> URLRequest {
         var urlRequest = URLRequest(url: request.url)
         urlRequest.httpMethod = request.method.rawValue
         urlRequest.allHTTPHeaderFields = request.headers

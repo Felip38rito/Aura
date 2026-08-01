@@ -1,6 +1,6 @@
 import Foundation
 
-public struct HTTPResponse: Sendable {
+public struct AuraHTTPResponse: Sendable {
     public let statusCode: Int
     public let headers: [String: String]
     public let body: Data

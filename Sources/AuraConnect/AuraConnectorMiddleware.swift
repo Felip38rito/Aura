@@ -1,6 +1,6 @@
 import Foundation
 
 public protocol AuraConnectorMiddleware: Sendable {
-    func before(request: HTTPRequest) async throws -> HTTPRequest
-    func after(response: HTTPResponse) async throws -> HTTPResponse
+    func before(request: AuraHTTPRequest) async throws -> AuraHTTPRequest
+    func after(response: AuraHTTPResponse) async throws -> AuraHTTPResponse
 }

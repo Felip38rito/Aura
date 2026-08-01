@@ -1,13 +1,13 @@
 import Foundation
 
-public struct HTTPRequest: Sendable {
-    public let method: HTTPMethod
+public struct AuraHTTPRequest: Sendable {
+    public let method: AuraHTTPMethod
     public let url: URL
     public let headers: [String: String]
     public let body: Data?
 
     public init(
-        method: HTTPMethod,
+        method: AuraHTTPMethod,
         url: URL,
         headers: [String: String] = [:],
         body: Data? = nil
