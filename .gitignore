@@ -6,3 +6,10 @@ DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+/Derived/
+/Tuist/*.xcworkspace/
+/Tuist/*.xcworkspace
+/Tuist/.tuist-generated
+/Tuist/.build
+/Tuist/xcuserdata/
+/Tuist/xcshareddata/
