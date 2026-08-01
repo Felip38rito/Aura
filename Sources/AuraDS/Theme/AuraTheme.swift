@@ -56,8 +56,21 @@ public struct AuraTheme: Decodable, Sendable {
     }
 
     // MARK: - Default Theme
+    
+    /// Returns a new theme by merging `self` with `overlay`.
+    /// Non-nil values in `overlay` override `self`; nil values keep `self`.
+    public func merging(with overlay: AuraTheme) -> AuraTheme {
+        AuraTheme(
+            heading: self.heading.merging(overlay.heading) { _, new in new },
+            text: self.text.merging(overlay.text) { _, new in new },
+            button: self.button.merging(overlay.button) { _, new in new },
+            container: self.container.merging(overlay.container) { _, new in new },
+            image: self.image.merging(overlay.image) { _, new in new }
+        )
+    }
 
     /// The built-in default theme. Covers all standard component + theme combinations.
+
     public static let `default` = AuraTheme(
         heading: [
             .primary: ComponentStyle(textColor: "color.text.primary", font: "font.heading1", margin: "spacing.md"),

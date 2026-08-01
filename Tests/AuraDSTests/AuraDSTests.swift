@@ -199,6 +199,43 @@ struct AuraThemeTests {
         let style = theme.heading[.ghost] ?? .empty
         #expect(style.textColor == nil)
     }
+
+    @Test("merge with partial overlay")
+    func mergePartial() {
+        let base = AuraTheme.default
+        var overlay = AuraTheme()
+        overlay.heading[.primary] = ComponentStyle(textColor: "color.text.custom", font: "font.custom")
+        
+        let merged = base.merging(with: overlay)
+        #expect(merged.heading[.primary]?.textColor == "color.text.custom")
+        #expect(merged.text[.primary]?.textColor == base.text[.primary]?.textColor)
+    }
+
+    @Test("merge with empty overlay")
+    func mergeEmpty() {
+        let base = AuraTheme.default
+        let merged = base.merging(with: AuraTheme())
+        #expect(merged.heading.count == base.heading.count)
+    }
+
+    @Test("merge preserves non-overwritten values")
+    func mergePreserves() {
+        let base = AuraTheme(heading: [.primary: ComponentStyle(textColor: "base")])
+        let overlay = AuraTheme(text: [.primary: ComponentStyle(textColor: "overlay")])
+        
+        let merged = base.merging(with: overlay)
+        #expect(merged.heading[.primary]?.textColor == "base")
+        #expect(merged.text[.primary]?.textColor == "overlay")
+    }
+
+    @Test("merge overwrites existing values")
+    func mergeOverwrites() {
+        let base = AuraTheme(heading: [.primary: ComponentStyle(textColor: "base")])
+        let overlay = AuraTheme(heading: [.primary: ComponentStyle(textColor: "overlay")])
+        
+        let merged = base.merging(with: overlay)
+        #expect(merged.heading[.primary]?.textColor == "overlay")
+    }
 }
 
 // MARK: - Resolver Tests
