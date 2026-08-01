@@ -9,6 +9,7 @@ let package = Package(
         .library(name: "AuraKernel", targets: ["AuraKernel"]),
         .library(name: "AuraDS", targets: ["AuraDS"]),
         .library(name: "AuraSDUI", targets: ["AuraSDUI"]),
+        .library(name: "AuraConnect", targets: ["AuraConnect"]),
     ],
     targets: [
         .target(
@@ -27,6 +28,12 @@ let package = Package(
         .target(
             name: "AuraSDUI",
             dependencies: ["AuraDS", "AuraKernel"],
+            swiftSettings: [
+                .enableUpcomingFeature("ApproachableConcurrency"),
+            ]
+        ),
+        .target(
+            name: "AuraConnect",
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency"),
             ]
