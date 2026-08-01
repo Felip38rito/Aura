@@ -52,7 +52,7 @@ Aura/
 ### 1. Start Session
 - Confirm the current branch: `git branch --show-current`.
 - Run `swift build` to establish a clean baseline.
-- If the example project exists and may be stale, run `tuist generate` inside `Tuist/`.
+- If the example project exists and may be stale, run `tuist generate --no-open` inside `Tuist/` (the `--no-open` flag prevents Xcode from launching).
 
 ### 2. Make Changes
 - **Small changes** (rename, move file, trivial fix, single preview): proceed directly and report what was done.
@@ -62,7 +62,7 @@ Aura/
 ### 3. Build & Test
 - After code changes, run `swift build`.
 - When test targets exist, run `swift test`.
-- When `Package.swift` or Tuist files change, regenerate the example project with `tuist generate`.
+- When `Package.swift` or Tuist files change, regenerate the example project with `tuist generate --no-open` (prevents Xcode from launching).
 - Report the output. If it fails, stop and diagnose together.
 
 ### 4. Commit
