@@ -247,26 +247,36 @@ struct AuraColorResolverTests {
     func allTokensResolve() {
         let resolver = AuraColorResolver.default
         let transparentTokens: Set<AuraColorToken> = [.neutralClear, .controlGhost]
-        for token in AuraColorToken.allCases {
-            let color = resolver.resolve(token)
-            if transparentTokens.contains(token) {
-                #expect(color.alpha == 0, "\(token.rawValue) should be transparent")
-            } else {
-                #expect(color.alpha > 0, "\(token.rawValue) should resolve to a visible color")
+        for scheme in [AuraColorScheme.light, .dark] {
+            for token in AuraColorToken.allCases {
+                let color = resolver.resolve(token, scheme)
+                if transparentTokens.contains(token) {
+                    #expect(color.alpha == 0, "\(token.rawValue) in \(scheme) should be transparent")
+                } else {
+                    #expect(color.alpha > 0, "\(token.rawValue) in \(scheme) should resolve to a visible color")
+                }
             }
         }
     }
 
+    @Test("dark mode resolves different values than light")
+    func darkModeDiffers() {
+        let resolver = AuraColorResolver.default
+        let light = resolver.resolve(.textPrimary, .light)
+        let dark = resolver.resolve(.textPrimary, .dark)
+        #expect(light != dark)
+    }
+
     @Test("custom resolver overrides specific token")
     func customResolver() {
-        let custom = AuraColorResolver { token in
+        let custom = AuraColorResolver { token, scheme in
             if token == .controlPrimary {
                 return CGColor(srgbRed: 0, green: 1, blue: 0, alpha: 1)  // green
             }
-            return AuraColorResolver.default.resolve(token)
+            return AuraColorResolver.default.resolve(token, scheme)
         }
 
-        let green = custom.resolve(.controlPrimary)
+        let green = custom.resolve(.controlPrimary, .light)
         let components = green.components
         #expect(components?[0] == 0)     // R
         #expect(components?[1] == 1)     // G

@@ -1,1 +1,0 @@
-// AuraConnect namespace

@@ -12,8 +12,13 @@ public struct AuraButton: View {
     let action: () -> Void
 
     @Environment(\.colorResolver) private var colorResolver
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.fontResolver) private var fontResolver
     @Environment(\.spacingResolver) private var spacingResolver
+
+    private var auraColorScheme: AuraColorScheme {
+        colorScheme == .dark ? .dark : .light
+    }
 
     public init(label: String, style: ComponentStyle, action: @escaping () -> Void) {
         self.label = label
@@ -41,8 +46,8 @@ public struct AuraButton: View {
     }
 
     private var resolvedTextColor: Color {
-        guard let token = style.textColor else { return colorResolver.resolve(.textOnPrimary).auraColor }
-        return colorResolver.resolve(AuraColorToken(rawValue: token) ?? .textOnPrimary).auraColor
+        guard let token = style.textColor else { return colorResolver.resolve(.textOnPrimary, auraColorScheme).auraColor }
+        return colorResolver.resolve(AuraColorToken(rawValue: token) ?? .textOnPrimary, auraColorScheme).auraColor
     }
 
     private var resolvedPadding: CGFloat {
@@ -51,7 +56,7 @@ public struct AuraButton: View {
     }
 
     private var resolvedBackground: Color {
-        guard let token = style.backgroundColor else { return colorResolver.resolve(.controlPrimary).auraColor }
-        return colorResolver.resolve(AuraColorToken(rawValue: token) ?? .controlPrimary).auraColor
+        guard let token = style.backgroundColor else { return colorResolver.resolve(.controlPrimary, auraColorScheme).auraColor }
+        return colorResolver.resolve(AuraColorToken(rawValue: token) ?? .controlPrimary, auraColorScheme).auraColor
     }
 }

@@ -86,6 +86,6 @@ public struct ComponentRenderer: Sendable {
 
     private func resolveBackground(_ token: String?) -> Color {
         guard let token else { return .clear }
-        return AuraColorResolver.default.resolve(AuraColorToken(rawValue: token) ?? .surfacePrimary).auraColor
+        return AuraColorResolver.default.resolve(AuraColorToken(rawValue: token) ?? .surfacePrimary, .light).auraColor
     }
 }
