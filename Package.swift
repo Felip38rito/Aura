@@ -59,5 +59,12 @@ let package = Package(
                 .enableUpcomingFeature("ApproachableConcurrency"),
             ]
         ),
+        .testTarget(
+            name: "AuraConnectTests",
+            dependencies: ["AuraConnect"],
+            swiftSettings: [
+                .enableUpcomingFeature("ApproachableConcurrency"),
+            ]
+        ),
     ]
 )
