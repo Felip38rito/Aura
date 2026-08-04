@@ -5,6 +5,8 @@ import SwiftUI
 // MARK: - Content View
 //
 // Reads plugin state from the kernels and renders it with AuraDS components.
+// All colors resolve through AuraColorResolver using the environment's
+// color scheme, so light/dark adapt automatically via the AuraDS tokens.
 
 struct ContentView: View {
     @State private var theme: AuraTheme = .default
@@ -12,6 +14,8 @@ struct ContentView: View {
     @State private var configItems: [String] = []
     @State private var lifecycleEvents: [String] = []
     @State private var appLaunchCount: Int = 0
+
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         NavigationStack {
@@ -26,7 +30,7 @@ struct ContentView: View {
             }
             .navigationTitle("Aura Kernel Demo")
             .background(
-                Color(cgColor: AuraColorResolver.default.resolve(.backgroundPrimary, .light))
+                Color(cgColor: AuraColorResolver.default.resolve(.backgroundPrimary, auraColorScheme))
             )
         }
         .onAppear { loadKernelData() }
@@ -40,13 +44,14 @@ struct ContentView: View {
             AuraText(content: "AppDelegate + SceneDelegate boot via AuraKernel", style: theme.text[.secondary] ?? .empty)
             HStack {
                 Image(systemName: "app.fill")
+                    .foregroundStyle(iconColor)
                 AuraText(content: "App active count: \(appLaunchCount)", style: theme.text[.primary] ?? .empty)
             }
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: containerStyle.cornerRadius ?? 8))
     }
 
     private var pluginsSection: some View {
@@ -56,6 +61,7 @@ struct ContentView: View {
             ForEach(pluginIdentifiers, id: \.self) { id in
                 HStack {
                     Image(systemName: "puzzlepiece.extension.fill")
+                        .foregroundStyle(iconColor)
                     AuraText(content: id, style: theme.text[.primary] ?? .empty)
                 }
             }
@@ -63,7 +69,7 @@ struct ContentView: View {
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: containerStyle.cornerRadius ?? 8))
     }
 
     private var configSection: some View {
@@ -77,7 +83,7 @@ struct ContentView: View {
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: containerStyle.cornerRadius ?? 8))
     }
 
     private var lifecycleSection: some View {
@@ -94,6 +100,7 @@ struct ContentView: View {
                     HStack {
                         Image(systemName: "circle.fill")
                             .font(.caption)
+                            .foregroundStyle(iconColor)
                         AuraText(content: event, style: theme.text[.primary] ?? .empty)
                     }
                 }
@@ -106,13 +113,30 @@ struct ContentView: View {
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: containerStyle.cornerRadius ?? 8))
     }
 
     // MARK: - Helpers
 
+    private var auraColorScheme: AuraColorScheme {
+        colorScheme == .dark ? .dark : .light
+    }
+
+    /// Icon tint derived from the AuraDS secondary text token (dark/light aware).
+    private var iconColor: Color {
+        Color(cgColor: AuraColorResolver.default.resolve(.textSecondary, auraColorScheme))
+    }
+
+    /// The container card style from the AuraDS theme (token-based, dark/light aware).
+    private var containerStyle: ComponentStyle {
+        theme.container[.secondary] ?? .empty
+    }
+
     private var cardBackground: Color {
-        Color(cgColor: AuraColorResolver.default.resolve(.surfaceSecondary, .light))
+        guard let token = containerStyle.backgroundColor else {
+            return Color(cgColor: AuraColorResolver.default.resolve(.surfaceSecondary, auraColorScheme))
+        }
+        return Color(cgColor: AuraColorResolver.default.resolve(AuraColorToken(rawValue: token) ?? .surfaceSecondary, auraColorScheme))
     }
 
     private func loadKernelData() {
