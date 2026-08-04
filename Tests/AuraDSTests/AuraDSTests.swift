@@ -259,12 +259,32 @@ struct AuraColorResolverTests {
         }
     }
 
-    @Test("dark mode resolves different values than light")
-    func darkModeDiffers() {
+    @Test("dark mode resolves same dynamic color for semantic tokens (system handles adaptation)")
+    func semanticTokensResolveDynamicColor() {
+        // With system semantic colors, the default resolver delegates light/dark
+        // adaptation to the OS (UIColor/NSColor dynamic colors). The explicit
+        // `scheme` parameter is honored by custom resolvers and server themes,
+        // but the default resolver returns the system dynamic color for both.
         let resolver = AuraColorResolver.default
         let light = resolver.resolve(.textPrimary, .light)
         let dark = resolver.resolve(.textPrimary, .dark)
-        #expect(light != dark)
+        #expect(light == dark)
+        #expect(light.alpha > 0)
+    }
+
+    @Test("semantic colors adapt to system trait (light resolves light, dark resolves dark)")
+    func systemColorsAdapt() {
+        // On Apple platforms, UIColor/NSColor dynamic colors resolve against the
+        // current trait collection. `.label` is light in light mode and light-on-dark
+        // in dark mode, so its luminance differs between the two trait environments.
+        #if canImport(UIKit)
+        let label = UIColor.label
+        let lightTrait = UITraitCollection(userInterfaceStyle: .light)
+        let darkTrait = UITraitCollection(userInterfaceStyle: .dark)
+        let lightCG = label.resolvedColor(with: lightTrait).cgColor
+        let darkCG = label.resolvedColor(with: darkTrait).cgColor
+        #expect(lightCG != darkCG, "system .label should differ between light and dark")
+        #endif
     }
 
     @Test("custom resolver overrides specific token")
@@ -294,6 +314,15 @@ struct AuraFontResolverTests {
             let font = resolver.resolve(token)
             #expect(font.size > 0, "\(token.rawValue) should have positive size")
             #expect(!font.family.isEmpty, "\(token.rawValue) should have a family")
+        }
+    }
+
+    @Test("default resolver maps tokens to SF text styles for Dynamic Type")
+    func mapsToTextStyles() {
+        let resolver = AuraFontResolver.default
+        for token in AuraFontToken.allCases {
+            let font = resolver.resolve(token)
+            #expect(font.textStyle != nil, "\(token.rawValue) should map to a text style for Dynamic Type")
         }
     }
 
