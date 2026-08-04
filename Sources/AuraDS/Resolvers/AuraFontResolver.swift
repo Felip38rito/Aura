@@ -2,7 +2,8 @@ import Foundation
 
 /// Resolves `AuraFontToken` into a platform-agnostic `AuraResolvedFont`.
 ///
-/// Works with SwiftUI, UIKit, and AppKit.
+/// Works with SwiftUI, UIKit, and AppKit. The default resolver maps tokens to
+/// SF text styles so text scales with the user's Dynamic Type preference.
 public struct AuraFontResolver: Sendable {
     public let resolve: @Sendable (AuraFontToken) -> AuraResolvedFont
 
@@ -12,16 +13,16 @@ public struct AuraFontResolver: Sendable {
 
     public static let `default` = AuraFontResolver { token in
         switch token {
-        case .largeTitle: AuraResolvedFont.system(size: 34, weight: .regular)
-        case .heading1: AuraResolvedFont.system(size: 28, weight: .bold)
-        case .heading2: AuraResolvedFont.system(size: 22, weight: .bold)
-        case .heading3: AuraResolvedFont.system(size: 20, weight: .bold)
-        case .body: AuraResolvedFont.system(size: 17, weight: .regular)
-        case .bodySmall: AuraResolvedFont.system(size: 15, weight: .regular)
-        case .caption: AuraResolvedFont.system(size: 12, weight: .regular)
-        case .button: AuraResolvedFont.system(size: 17, weight: .semibold)
-        case .buttonSmall: AuraResolvedFont.system(size: 15, weight: .semibold)
-        case .label: AuraResolvedFont.system(size: 11, weight: .regular)
+        case .largeTitle: .system(textStyle: .largeTitle)
+        case .heading1: .system(textStyle: .title1)
+        case .heading2: .system(textStyle: .title2)
+        case .heading3: .system(textStyle: .title3)
+        case .body: .system(textStyle: .body)
+        case .bodySmall: .system(textStyle: .subheadline)
+        case .caption: .system(textStyle: .caption1)
+        case .button: .system(textStyle: .headline, weight: .semibold)
+        case .buttonSmall: .system(textStyle: .subheadline, weight: .semibold)
+        case .label: .system(textStyle: .footnote)
         }
     }
 }

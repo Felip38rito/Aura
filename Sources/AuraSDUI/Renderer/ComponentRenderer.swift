@@ -41,7 +41,7 @@ public struct ComponentRenderer: Sendable {
                     }
                 }
                 .padding(resolvePadding(style.padding))
-                .background(resolveBackground(style.backgroundColor))
+                .background(ContainerBackground(token: style.backgroundColor))
                 .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius ?? 0))
             )
 
@@ -83,9 +83,19 @@ public struct ComponentRenderer: Sendable {
         guard let token else { return 0 }
         return AuraSpacingResolver.default.resolve(AuraSpacingToken(rawValue: token) ?? .md)
     }
+}
 
-    private func resolveBackground(_ token: String?) -> Color {
-        guard let token else { return .clear }
-        return AuraColorResolver.default.resolve(AuraColorToken(rawValue: token) ?? .surfacePrimary, .light).auraColor
+/// Resolves a container background color token from the environment's color
+/// scheme so dark/light adapt via the AuraDS resolver.
+private struct ContainerBackground: View {
+    let token: String?
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        let scheme: AuraColorScheme = colorScheme == .dark ? .dark : .light
+        return AuraColorResolver.default
+            .resolve(AuraColorToken(rawValue: token ?? "") ?? .surfacePrimary, scheme)
+            .auraColor
     }
 }
