@@ -23,7 +23,7 @@
             }
         },
         {
-            "label": "AuraExample: Run (Simulator)",
+            "label": "AuraExample: Run (Mac Catalyst)",
             "type": "shell",
             "command": "xcodebuild",
             "args": [
@@ -32,7 +32,9 @@
                 "-scheme",
                 "AuraExample",
                 "-destination",
-                "platform=iOS Simulator,name=iPhone 17e",
+                "platform=macOS,variant=Mac Catalyst",
+                "-derivedDataPath",
+                "Example/.catalystDD",
                 "build"
             ],
             "problemMatcher": ["$swiftc"],
@@ -40,7 +42,18 @@
                 "reveal": "always",
                 "panel": "shared",
                 "clear": true
-            }
+            },
+            "dependsOn": []
+        },
+        {
+            "label": "AuraExample: Launch (Mac Catalyst)",
+            "type": "shell",
+            "command": "open",
+            "args": [
+                "Example/.catalystDD/Build/Products/Debug-maccatalyst/AuraExample.app"
+            ],
+            "problemMatcher": [],
+            "dependsOn": ["AuraExample: Run (Mac Catalyst)"]
         }
     ]
 }

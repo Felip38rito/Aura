@@ -20,7 +20,7 @@ let project = Project(
     targets: [
         .target(
             name: "AuraExample",
-            destinations: .iOS,
+            destinations: [.iPhone, .macCatalyst],
             product: .app,
             bundleId: "com.nousresearch.aura.example",
             deploymentTargets: .iOS("17.0"),

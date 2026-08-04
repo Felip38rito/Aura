@@ -12,6 +12,7 @@ DerivedData/
 /Example/*.xcodeproj/
 /Example/.build
 /Example/.derivedData
+/Example/.catalystDD
 /Example/.tuist-generated
 /Example/Derived/
 /Example/xcuserdata/
