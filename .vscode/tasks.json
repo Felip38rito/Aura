@@ -1,0 +1,59 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "AuraExample: Build (Simulator)",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "-workspace",
+                "Example/AuraExample.xcworkspace",
+                "-scheme",
+                "AuraExample",
+                "-destination",
+                "platform=iOS Simulator,name=iPhone 17e",
+                "build"
+            ],
+            "group": "build",
+            "problemMatcher": ["$swiftc"],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            }
+        },
+        {
+            "label": "AuraExample: Run (Mac Catalyst)",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "-workspace",
+                "Example/AuraExample.xcworkspace",
+                "-scheme",
+                "AuraExample",
+                "-destination",
+                "platform=macOS,variant=Mac Catalyst",
+                "-derivedDataPath",
+                "Example/.catalystDD",
+                "build"
+            ],
+            "problemMatcher": ["$swiftc"],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            },
+            "dependsOn": []
+        },
+        {
+            "label": "AuraExample: Launch (Mac Catalyst)",
+            "type": "shell",
+            "command": "open",
+            "args": [
+                "Example/.catalystDD/Build/Products/Debug-maccatalyst/AuraExample.app"
+            ],
+            "problemMatcher": [],
+            "dependsOn": ["AuraExample: Run (Mac Catalyst)"]
+        }
+    ]
+}

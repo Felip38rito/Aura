@@ -69,6 +69,50 @@ struct AuraRequestBuilderTests {
             try builder.build()
         }
     }
+
+    @Test func testWithValidEndpoint() throws {
+        let request = try AuraRequestBuilder()
+            .with(method: .get)
+            .with(endpoint: "https://aura.ai")
+            .build()
+
+        #expect(request.url == URL(string: "https://aura.ai"))
+    }
+
+    @Test func testWithInvalidEndpointThrows() {
+        let builder = AuraRequestBuilder()
+            .with(method: .get)
+        #expect(throws: AuraRequestBuilder.AuraRequestBuilderError.self) {
+            try builder.with(endpoint: "").build()
+        }
+    }
+
+    @Test func testWithBaseURLAndPath() throws {
+        let request = try AuraRequestBuilder()
+            .with(method: .get)
+            .with(baseURL: "https://api.aura.ai")
+            .with(path: "v1/users")
+            .build()
+
+        #expect(request.url == URL(string: "https://api.aura.ai/v1/users"))
+    }
+
+    @Test func testWithBaseURLOnly() throws {
+        let request = try AuraRequestBuilder()
+            .with(method: .get)
+            .with(baseURL: "https://api.aura.ai")
+            .build()
+
+        #expect(request.url == URL(string: "https://api.aura.ai"))
+    }
+
+    @Test func testWithInvalidBaseURLThrows() {
+        let builder = AuraRequestBuilder()
+            .with(method: .get)
+        #expect(throws: AuraRequestBuilder.AuraRequestBuilderError.self) {
+            try builder.with(baseURL: "").build()
+        }
+    }
 }
 
 struct MockBody: Codable, Equatable {

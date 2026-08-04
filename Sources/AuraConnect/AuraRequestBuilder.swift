@@ -3,6 +3,8 @@ import Foundation
 public struct AuraRequestBuilder: Sendable {
     private var method: AuraHTTPMethod?
     private var url: URL?
+    private var baseURL: String?
+    private var path: String?
     private var headers: [String: String] = [:]
     private var body: Data?
 
@@ -17,6 +19,30 @@ public struct AuraRequestBuilder: Sendable {
     public func with(url: URL) -> AuraRequestBuilder {
         var copy = self
         copy.url = url
+        return copy
+    }
+
+    public func with(endpoint: String) throws -> AuraRequestBuilder {
+        guard let url = URL(string: endpoint) else {
+            throw AuraRequestBuilderError.invalidEndpoint(endpoint)
+        }
+        var copy = self
+        copy.url = url
+        return copy
+    }
+
+    public func with(baseURL: String) throws -> AuraRequestBuilder {
+        guard URL(string: baseURL) != nil else {
+            throw AuraRequestBuilderError.invalidEndpoint(baseURL)
+        }
+        var copy = self
+        copy.baseURL = baseURL
+        return copy
+    }
+
+    public func with(path: String) -> AuraRequestBuilder {
+        var copy = self
+        copy.path = path
         return copy
     }
 
@@ -54,15 +80,26 @@ public struct AuraRequestBuilder: Sendable {
         guard let method = method else {
             throw AuraRequestBuilderError.missingMethod
         }
-        guard let url = url else {
+
+        let resolvedURL: URL
+        if let url = url {
+            resolvedURL = url
+        } else if let baseURL = baseURL, let base = URL(string: baseURL) {
+            if let path = path {
+                resolvedURL = base.appendingPathComponent(path)
+            } else {
+                resolvedURL = base
+            }
+        } else {
             throw AuraRequestBuilderError.missingURL
         }
 
-        return AuraHTTPRequest(method: method, url: url, headers: headers, body: body)
+        return AuraHTTPRequest(method: method, url: resolvedURL, headers: headers, body: body)
     }
 
     public enum AuraRequestBuilderError: Error, Sendable {
         case missingMethod
         case missingURL
+        case invalidEndpoint(String)
     }
 }

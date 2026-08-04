@@ -1,0 +1,8 @@
+{
+    "sweetpad.build.xcodeWorkspacePath": "Example/AuraExample.xcworkspace",
+    "sweetpad.build.xcodeScheme": "AuraExample",
+    "sweetpad.build.destination": {
+        "id": "A9F54FAF-210A-4171-B21E-CF6106B42FD2",
+        "type": "iOSSimulator"
+    }
+}
