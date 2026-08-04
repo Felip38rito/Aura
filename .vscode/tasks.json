@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "AuraExample: Build (Simulator)",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "-workspace",
+                "Example/AuraExample.xcworkspace",
+                "-scheme",
+                "AuraExample",
+                "-destination",
+                "platform=iOS Simulator,name=iPhone 17e",
+                "build"
+            ],
+            "group": "build",
+            "problemMatcher": ["$swiftc"],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            }
+        },
+        {
+            "label": "AuraExample: Run (Simulator)",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "-workspace",
+                "Example/AuraExample.xcworkspace",
+                "-scheme",
+                "AuraExample",
+                "-destination",
+                "platform=iOS Simulator,name=iPhone 17e",
+                "build"
+            ],
+            "problemMatcher": ["$swiftc"],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            }
+        }
+    ]
+}
