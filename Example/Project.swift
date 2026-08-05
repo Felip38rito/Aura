@@ -29,6 +29,7 @@ let project = Project(
             dependencies: [
                 .external(name: "AuraKernel"),
                 .external(name: "AuraDS"),
+                .external(name: "AuraSDUI"),
             ]
         )
     ]
