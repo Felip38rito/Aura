@@ -30,7 +30,12 @@ let project = Project(
                 .external(name: "AuraKernel"),
                 .external(name: "AuraDS"),
                 .external(name: "AuraSDUI"),
-            ]
+            ],
+            settings: .settings(base: [
+                "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "YES",
+                "DEVELOPMENT_TEAM": "9V2UBM64QJ",
+                "CODE_SIGN_STYLE": "Automatic",
+            ])
         )
     ]
 )
