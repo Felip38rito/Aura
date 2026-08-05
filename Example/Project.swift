@@ -22,7 +22,7 @@ let project = Project(
             name: "AuraExample",
             destinations: [.iPhone, .macCatalyst],
             product: .app,
-            bundleId: "com.nousresearch.aura.example",
+            bundleId: "com.felip38rito.aura",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(with: infoPlist),
             sources: ["Sources/**"],
@@ -30,7 +30,12 @@ let project = Project(
                 .external(name: "AuraKernel"),
                 .external(name: "AuraDS"),
                 .external(name: "AuraSDUI"),
-            ]
+            ],
+            settings: .settings(base: [
+                "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "YES",
+                "DEVELOPMENT_TEAM": "9V2UBM64QJ",
+                "CODE_SIGN_STYLE": "Automatic",
+            ])
         )
     ]
 )
