@@ -18,7 +18,7 @@ Aura lets you define user interfaces as structured data and render them through 
 - 🎨 **Token-Based Design System** — semantic colors, typography, and spacing resolved at runtime.
 - 🧩 **Plugin Architecture** — compose app features as isolated `AuraKernelPlugin` instances with dependency ordering.
 - 🧪 **Testable by Design** — domain contracts are pure Swift structs with no UI framework dependencies.
-- 📱 **Example App** — Tuist-generated Xcode project showcasing all components and SDUI pipeline.
+- 📱 **Example App** — Didactic example demonstrating how to consume Aura via SPM, featuring a hub to explore the Kernel, Design System, and SDUI pipeline.
 
 ## Requirements
 
@@ -36,7 +36,7 @@ swift test
 To open the example Xcode project:
 
 ```bash
-cd Tuist
+cd Example
 tuist install
 tuist generate --no-open
 open AuraExample.xcworkspace
@@ -86,6 +86,15 @@ AuraDS Components (AuraButton, AuraHeading, AuraText)
     ▼
 AuraTheme → Resolvers (Color, Font, Spacing)
 ```
+
+
+## Using Aura in your own app
+
+To integrate Aura into a new Xcode project:
+
+1. **Add the Aura package as an SPM dependency**: Go to `File > Add Package Dependencies` and point to this repository's URL or local path.
+2. **Wire the kernel**: Subclass `AuraAppKernel` (for `UIApplicationDelegate`) and/or `AuraSceneKernel` (for `UISceneDelegate`), register your plugins via `register(_:)`, and call `try! boot()` in the initializer.
+3. **Consume AuraDS and AuraSDUI**: Use components like `AuraHeading`, `AuraText`, and `AuraButton` with `AuraTheme.default`, and implement the SDUI pipeline by decoding JSON into `SUIComponent` and rendering it via `ComponentRenderer`.
 
 ## License
 
