@@ -22,7 +22,7 @@ let project = Project(
             name: "AuraExample",
             destinations: [.iPhone, .macCatalyst],
             product: .app,
-            bundleId: "com.nousresearch.aura.example",
+            bundleId: "com.felip38rito.aura",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(with: infoPlist),
             sources: ["Sources/**"],
