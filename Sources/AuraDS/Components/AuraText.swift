@@ -21,7 +21,7 @@ public struct AuraText: View {
     public var body: some View {
         Text(content)
             .font(resolvedFont)
-            .foregroundColor(resolvedColor)
+            .foregroundStyle(resolvedColor)
     }
 
     // MARK: - Resolved Values

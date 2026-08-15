@@ -22,7 +22,7 @@ public struct AuraHeading: View {
     public var body: some View {
         Text(content)
             .font(resolvedFont)
-            .foregroundColor(resolvedColor)
+            .foregroundStyle(resolvedColor)
             .padding(.bottom, resolvedMargin)
     }
 
