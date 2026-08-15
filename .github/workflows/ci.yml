@@ -12,9 +12,9 @@ concurrency:
 jobs:
   build-and-test:
     name: Build & Test
-    # Xcode 27 (Swift 6.4) is required by swift-tools-version 6.4 and
-    # ApproachableConcurrency. Only the xcode-27 preview image ships it.
-    runs-on: xcode-27
+    # Swift 6.0+ is required by swift-tools-version 6.0 and
+    # ApproachableConcurrency. macos-26 ships Xcode 26.6 (Swift 6.3.3).
+    runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v4
