@@ -5,6 +5,10 @@ import PackageDescription
 
 let package = Package(
     name: "Aura",
+    platforms: [
+        .iOS(.v17),
+        .macOS(.v14),
+    ],
     products: [
         .library(name: "AuraKernel", targets: ["AuraKernel"]),
         .library(name: "AuraDS", targets: ["AuraDS"]),
