@@ -16,64 +16,76 @@ public struct ComponentRenderer: Sendable {
         self.onAction = onAction
     }
 
-    public func render(_ component: SUIComponent) -> AnyView {
+    public func render(_ component: SUIComponent) -> some View {
+        SUIComponentView(component: component, theme: theme, onAction: onAction)
+    }
+}
+
+/// A concrete view that renders a single `SUIComponent` node.
+///
+/// Being a named `View` type (rather than a recursive `some View` function)
+/// breaks the type recursion that a self-referential `@ViewBuilder` would
+/// otherwise create, while keeping every branch a concrete view — no `AnyView`.
+@MainActor
+private struct SUIComponentView: View {
+    let component: SUIComponent
+    let theme: AuraTheme
+    let onAction: @Sendable (AuraComponentAction) -> Void
+
+    var body: some View {
         switch component {
-        case .heading(let data):
+        case .heading(_, let data):
             let style = theme.heading[data.theme] ?? .empty
-            return AnyView(AuraHeading(content: data.content, style: style))
+            AuraHeading(content: data.content, style: style)
 
-        case .text(let data):
+        case .text(_, let data):
             let style = theme.text[data.theme] ?? .empty
-            return AnyView(AuraText(content: data.content, style: style))
+            AuraText(content: data.content, style: style)
 
-        case .button(let data):
+        case .button(_, let data):
             let style = theme.button[data.theme] ?? .empty
-            return AnyView(AuraButton(label: data.label, style: style) { [action = data.action, onAction] in
+            AuraButton(label: data.label, style: style) { [action = data.action, onAction] in
                 onAction(action)
-            })
+            }
 
-        case .container(let themeName, let children):
+        case .container(_, let themeName, let children):
             let style = theme.container[themeName] ?? .empty
-            return AnyView(
-                VStack(spacing: 0) {
-                    ForEach(Array(children.enumerated()), id: \.offset) { [self] _, child in
-                        render(child)
-                    }
+            VStack(spacing: 0) {
+                ForEach(children) { child in
+                    SUIComponentView(component: child, theme: theme, onAction: onAction)
                 }
-                .padding(resolvePadding(style.padding))
-                .background(ContainerBackground(token: style.backgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius ?? 0))
-            )
+            }
+            .padding(resolvePadding(style.padding))
+            .background(ContainerBackground(token: style.backgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius ?? 0))
 
         case .spacer:
-            return AnyView(Spacer())
+            Spacer()
 
-        case .image(let data):
+        case .image(_, let data):
             let style = theme.image[data.theme] ?? .empty
-            return AnyView(
-                AsyncImage(url: URL(string: data.source)) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius ?? 0))
-                    case .failure:
-                        if let alt = data.altText {
-                            AuraText(content: alt, style: .empty)
-                        } else {
-                            Image(systemName: "photo").foregroundColor(.gray)
-                        }
-                    case .empty:
-                        ProgressView()
-                    @unknown default:
-                        EmptyView()
+            AsyncImage(url: URL(string: data.source)) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius ?? 0))
+                case .failure:
+                    if let alt = data.altText {
+                        AuraText(content: alt, style: .empty)
+                    } else {
+                        Image(systemName: "photo").foregroundStyle(.gray)
                     }
+                case .empty:
+                    ProgressView()
+                @unknown default:
+                    EmptyView()
                 }
-            )
+            }
 
         case .unknown:
-            return AnyView(EmptyView())
+            EmptyView()
         }
     }
 
@@ -86,15 +98,16 @@ public struct ComponentRenderer: Sendable {
 }
 
 /// Resolves a container background color token from the environment's color
-/// scheme so dark/light adapt via the AuraDS resolver.
+/// resolver and color scheme so dark/light adapt via the injected resolver.
 private struct ContainerBackground: View {
     let token: String?
 
+    @Environment(\.colorResolver) private var colorResolver
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         let scheme: AuraColorScheme = colorScheme == .dark ? .dark : .light
-        return AuraColorResolver.default
+        colorResolver
             .resolve(AuraColorToken(rawValue: token ?? "") ?? .surfacePrimary, scheme)
             .auraColor
     }
