@@ -1,10 +1,10 @@
 import Foundation
 
-// MARK: - AuraKernel
+// MARK: - AuraKernelBase
 
 /// The orchestration core of the Aura framework.
 ///
-/// `AuraKernel` manages app lifecycle by forwarding `UIApplicationDelegate`
+/// `AuraKernelBase` manages app lifecycle by forwarding `UIApplicationDelegate`
 /// and `UISceneDelegate` events to registered `AuraKernelPlugin` instances.
 ///
 /// For **new apps** (iOS 13+), use `AuraSceneKernel` as your `SceneDelegate`.
@@ -21,17 +21,17 @@ import Foundation
 /// }
 /// ```
 @MainActor
-open class AuraKernel: NSObject {
+open class AuraKernelBase: NSObject {
 
     // MARK: - Shared Singleton
 
-    private static var _shared: AuraKernel?
+    private static var _shared: AuraKernelBase?
 
     /// The shared kernel instance. Set automatically on first `boot()`.
-    public static var shared: AuraKernel {
-        guard let instance: AuraKernel = _shared else {
+    public static var shared: AuraKernelBase {
+        guard let instance: AuraKernelBase = _shared else {
             fatalError(
-                "AuraKernel.shared accessed before boot(). "
+                "AuraKernelBase.shared accessed before boot(). "
                 + "Call boot() in your SceneDelegate or AppDelegate initializer."
             )
         }
