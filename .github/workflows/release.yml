@@ -62,19 +62,24 @@ jobs:
           else
             # install.tuist.io is behind a Cloudflare challenge and returns HTML,
             # so download the official binary straight from GitHub releases.
+            # The tuist binary needs ProjectDescription.framework next to it at
+            # runtime, so install the whole unzipped package into /opt/tuist and
+            # symlink the binary into /usr/local/bin.
             TUIST_VERSION="4.204.0"
             curl -fsSL -o /tmp/tuist.zip \
               "https://github.com/tuist/tuist/releases/download/${TUIST_VERSION}/tuist.zip"
-            mkdir -p /tmp/tuist
-            unzip -q -o /tmp/tuist.zip -d /tmp/tuist
-            sudo install -m 0755 /tmp/tuist/tuist /usr/local/bin/tuist
-            rm -rf /tmp/tuist /tmp/tuist.zip
+            sudo mkdir -p /opt/tuist
+            sudo unzip -q -o /tmp/tuist.zip -d /opt/tuist
+            sudo ln -sf /opt/tuist/tuist /usr/local/bin/tuist
+            rm -rf /tmp/tuist.zip
           fi
           tuist version
 
       - name: Generate Xcode project
         if: steps.version.outputs.version != 'no-bump'
-        run: tuist generate
+        run: |
+          tuist install
+          tuist generate
 
       - name: Build xcframeworks and zip
         if: steps.version.outputs.version != 'no-bump'
