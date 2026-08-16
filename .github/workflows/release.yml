@@ -39,10 +39,14 @@ jobs:
           git tag "${{ steps.version.outputs.version }}"
           git push origin "${{ steps.version.outputs.version }}"
 
-      - name: Install Tuist
+      - name: Install Tuist (if not present)
         if: steps.version.outputs.version != 'no-bump'
         run: |
-          curl -Ls https://install.tuist.io | bash
+          if command -v tuist >/dev/null 2>&1; then
+            echo "tuist already installed: $(tuist version)"
+          else
+            curl -Ls https://install.tuist.io | bash
+          fi
           tuist version
 
       - name: Generate Xcode project
