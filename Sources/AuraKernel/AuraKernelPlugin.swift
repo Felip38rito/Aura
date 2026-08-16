@@ -23,9 +23,9 @@ public protocol AuraKernelPlugin: AnyObject {
 
     // ── Lifecycle ──
 
-    /// Called once during `AuraKernel.boot()`, in topological order.
+    /// Called once during `AuraKernelBase.boot()`, in topological order.
     /// - Parameter kernel: The kernel instance, for registering sub-components.
-    func boot(kernel: AuraKernel)
+    func boot(kernel: AuraKernelBase)
 
     // ── UIKit Lifecycle Hooks ──
     // These are only available on platforms with UIKit (iOS, tvOS, visionOS).
@@ -99,7 +99,7 @@ public extension AuraKernelPlugin {
 
     var dependencies: [String] { [] }
 
-    func boot(kernel: AuraKernel) {}
+    func boot(kernel: AuraKernelBase) {}
 }
 
 #if canImport(UIKit)

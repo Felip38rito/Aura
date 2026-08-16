@@ -9,7 +9,7 @@ final class LoggingPlugin: AuraKernelPlugin {
     let identifier = "logging"
     private(set) var events: [String] = []
 
-    func boot(kernel: AuraKernel) {
+    func boot(kernel: AuraKernelBase) {
         events.append("boot")
     }
 

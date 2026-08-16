@@ -21,7 +21,7 @@ struct KernelsView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     AuraHeading(content: "Registered Plugins", style: theme.heading[.secondary] ?? .empty)
                     
-                    ForEach(AuraKernel.shared.pluginList.map { $0.identifier }, id: \.self) { id in
+                    ForEach(AuraKernelBase.shared.pluginList.map { $0.identifier }, id: \.self) { id in
                         AuraText(content: "🧩 \(id)", style: theme.text[.primary] ?? .empty)
                     }
                 }
@@ -29,7 +29,7 @@ struct KernelsView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     AuraHeading(content: "Configuration", style: theme.heading[.secondary] ?? .empty)
                     
-                    if let configPlugin = AuraKernel.shared.pluginList.first(where: { $0.identifier == "configuration" }) as? ConfigurationPlugin {
+                    if let configPlugin = AuraKernelBase.shared.pluginList.first(where: { $0.identifier == "configuration" }) as? ConfigurationPlugin {
                         ForEach(configPlugin.config.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                             AuraText(content: "\(key): \(value)", style: theme.text[.primary] ?? .empty)
                         }
