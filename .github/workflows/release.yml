@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release
+    runs-on: macos-26
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need full history for git describe (latest tag)
+
+      - name: Determine version from commit message
+        id: version
+        run: |
+          MSG="${{ github.event.head_commit.message }}"
+          VERSION="$(bash scripts/bump_version.sh "$MSG")"
+          echo "commit message: $MSG"
+          echo "bump result: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if no bump prefix
+        if: steps.version.outputs.version == 'no-bump'
+        run: echo 'No major/minor/patch prefix in commit - no release. Skipping.'
+
+      - name: Create tag
+        if: steps.version.outputs.version != 'no-bump'
+        run: |
+          git tag "v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+
+      - name: Build xcframeworks and zip
+        if: steps.version.outputs.version != 'no-bump'
+        run: |
+          set -euo pipefail
+          FRAMEWORKS="AuraKernel AuraDS AuraSDUI AuraConnect"
+          mkdir -p build/xcframeworks
+
+          for FW in $FRAMEWORKS; do
+            echo "=== Building $FW ==="
+            # iOS device
+            xcodebuild archive -scheme "$FW" -destination 'generic/platform=iOS' \
+              -archivePath "build/$FW-ios-device" CODE_SIGNING_ALLOWED=NO \
+              SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+            # iOS simulator
+            xcodebuild archive -scheme "$FW" -destination 'generic/platform=iOS Simulator' \
+              -archivePath "build/$FW-ios-sim" CODE_SIGNING_ALLOWED=NO \
+              SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+            # macOS
+            xcodebuild archive -scheme "$FW" -destination 'generic/platform=macOS' \
+              -archivePath "build/$FW-macos" CODE_SIGNING_ALLOWED=NO \
+              SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+            # Combine into xcframework
+            xcodebuild -create-xcframework \
+              -framework "build/$FW-ios-device.xcarchive/Products/Library/Frameworks/$FW.framework" \
+              -framework "build/$FW-ios-sim.xcarchive/Products/Library/Frameworks/$FW.framework" \
+              -framework "build/$FW-macos.xcarchive/Products/Library/Frameworks/$FW.framework" \
+              -output "build/xcframeworks/$FW.xcframework"
+          done
+
+          # Zip all xcframeworks into a single archive
+          cd build/xcframeworks
+          zip -r ../Aura.xcframework.zip *.xcframework
+          cd ../..
+          ls -lh build/Aura.xcframework.zip
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.version != 'no-bump'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            --title "Aura v${{ steps.version.outputs.version }}" \
+            --generate-notes \
+            build/Aura.xcframework.zip
