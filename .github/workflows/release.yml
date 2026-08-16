@@ -42,10 +42,19 @@ jobs:
       - name: Install Tuist (if not present)
         if: steps.version.outputs.version != 'no-bump'
         run: |
+          set -euo pipefail
           if command -v tuist >/dev/null 2>&1; then
             echo "tuist already installed: $(tuist version)"
           else
-            curl -Ls https://install.tuist.io | bash
+            # install.tuist.io is behind a Cloudflare challenge and returns HTML,
+            # so download the official binary straight from GitHub releases.
+            TUIST_VERSION="4.204.0"
+            curl -fsSL -o /tmp/tuist.zip \
+              "https://github.com/tuist/tuist/releases/download/${TUIST_VERSION}/tuist.zip"
+            mkdir -p /tmp/tuist
+            unzip -q -o /tmp/tuist.zip -d /tmp/tuist
+            sudo install -m 0755 /tmp/tuist/tuist /usr/local/bin/tuist
+            rm -rf /tmp/tuist /tmp/tuist.zip
           fi
           tuist version
 
