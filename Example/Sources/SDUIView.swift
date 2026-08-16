@@ -11,28 +11,34 @@ struct SDUIView: View {
 
     private static let jsonPayload = """
     {
+        "id": "screen-1",
         "type": "container",
         "theme": "primary",
         "children": [
             {
+                "id": "h-1",
                 "type": "heading",
                 "content": "SDUI Welcome",
                 "theme": "primary"
             },
             {
+                "id": "t-1",
                 "type": "text",
                 "content": "This screen is rendered from a JSON payload using AuraSDUI.",
                 "theme": "secondary"
             },
             {
+                "id": "t-2",
                 "type": "text",
                 "content": "Try the button below to trigger a custom action.",
                 "theme": "secondary"
             },
             {
+                "id": "s-1",
                 "type": "spacer"
             },
             {
+                "id": "b-1",
                 "type": "button",
                 "content": "Perform Action",
                 "theme": "primary",

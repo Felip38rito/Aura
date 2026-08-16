@@ -30,10 +30,14 @@ public struct AuraButton: View {
         Button(action: action) {
             Text(label)
                 .font(resolvedFont)
-                .foregroundColor(resolvedTextColor)
+                .foregroundStyle(resolvedTextColor)
                 .padding(resolvedPadding)
                 .background(resolvedBackground)
-                .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius ?? 8))
+                .clipShape(RoundedRectangle(cornerRadius: resolvedCornerRadius))
+                .overlay(
+                    RoundedRectangle(cornerRadius: resolvedCornerRadius)
+                        .strokeBorder(resolvedBorderColor, lineWidth: 1)
+                )
         }
         .buttonStyle(.plain)
     }
@@ -58,5 +62,14 @@ public struct AuraButton: View {
     private var resolvedBackground: Color {
         guard let token = style.backgroundColor else { return colorResolver.resolve(.controlPrimary, auraColorScheme).auraColor }
         return colorResolver.resolve(AuraColorToken(rawValue: token) ?? .controlPrimary, auraColorScheme).auraColor
+    }
+
+    private var resolvedBorderColor: Color {
+        guard let token = style.borderColor else { return .clear }
+        return colorResolver.resolve(AuraColorToken(rawValue: token) ?? .borderPrimary, auraColorScheme).auraColor
+    }
+
+    private var resolvedCornerRadius: CGFloat {
+        style.cornerRadius ?? 8
     }
 }

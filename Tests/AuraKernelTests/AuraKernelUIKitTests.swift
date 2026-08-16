@@ -87,27 +87,10 @@ struct AppKernelLifecycleTests {
 }
 
 // MARK: - AuraSceneKernel Lifecycle Forwarding Tests
-
-@Suite("AuraSceneKernel Lifecycle Forwarding")
-@MainActor
-struct SceneKernelLifecycleTests {
-
-    @Test("forwards scene willConnectTo")
-    func forwardsSceneWillConnect() throws {
-        let kernel = AuraSceneKernel()
-        let plugin = LifecycleRecorderPlugin()
-        let scene = UIScene()
-        let session = UISceneSession()
-        let options = UIScene.ConnectionOptions()
-
-        kernel.register(plugin)
-        try kernel.boot()
-        plugin.events.removeAll()
-
-        kernel.scene(scene, willConnectTo: session, options: options)
-
-        #expect(plugin.events == ["sceneWillConnect"])
-    }
-}
+//
+// NOTE: The scene lifecycle forwarding (scene(_:willConnectTo:options:)) is not
+// unit-tested here because UISceneSession and UIScene.ConnectionOptions have no
+// public initializers, so the arguments cannot be constructed in a test. The
+// forwarding logic is exercised indirectly via the AuraExample app.
 
 #endif

@@ -8,6 +8,7 @@ DerivedData/
 .netrc
 /Derived/
 /Aura.xcodeproj/
+/Workspace.xcworkspace/
 /Example/*.xcworkspace/
 /Example/*.xcodeproj/
 /Example/.build
