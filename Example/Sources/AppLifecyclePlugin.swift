@@ -13,7 +13,7 @@ final class AppLifecyclePlugin: AuraKernelPlugin {
     let identifier = "app-lifecycle"
     private(set) var launchCount: Int = 0
 
-    func boot(kernel: AuraKernel) {
+    func boot(kernel: AuraKernelBase) {
         launchCount = 0
     }
 

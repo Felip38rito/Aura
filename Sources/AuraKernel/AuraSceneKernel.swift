@@ -20,7 +20,7 @@ import UIKit
 /// }
 /// ```
 @MainActor
-open class AuraSceneKernel: AuraKernel, UISceneDelegate {
+open class AuraSceneKernel: AuraKernelBase, UISceneDelegate {
 
     // MARK: - UISceneDelegate Forwarding
 

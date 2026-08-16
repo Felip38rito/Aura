@@ -7,7 +7,7 @@ import UIKit
 //
 // Demonstrates AuraSceneKernel (UISceneDelegate). This is where scene-based
 // plugins live — the kernel forwards scene lifecycle events to them. Boots
-// the kernel (which also sets AuraKernel.shared) and creates the window.
+// the kernel (which also sets AuraKernelBase.shared) and creates the window.
 
 @MainActor
 final class SceneDelegate: AuraSceneKernel {

@@ -8,7 +8,7 @@ final class ConfigurationPlugin: AuraKernelPlugin {
 
     private(set) var config: [String: String] = [:]
 
-    func boot(kernel: AuraKernel) {
+    func boot(kernel: AuraKernelBase) {
         config = [
             "api_url": "https://api.aura.app",
             "app_version": "1.0.0",

@@ -13,7 +13,7 @@ final class BootRecorderPlugin: AuraKernelPlugin {
         self.dependencies = dependencies
     }
 
-    func boot(kernel: AuraKernel) {
+    func boot(kernel: AuraKernelBase) {
         bootOrder = Self._nextBootOrder
         Self._nextBootOrder += 1
     }
@@ -29,7 +29,7 @@ final class BootRecorderPlugin: AuraKernelPlugin {
 
 @MainActor
 func resetForTest() {
-    AuraKernel.resetShared()
+    AuraKernelBase.resetShared()
     BootRecorderPlugin.resetCounter()
 }
 
@@ -42,7 +42,7 @@ struct TopologicalSortTests {
     @Test("sorts plugins with no dependencies in registration order")
     func noDependencies() throws {
         resetForTest()
-        let kernel = AuraKernel()
+        let kernel = AuraKernelBase()
         let a = BootRecorderPlugin(identifier: "a")
         let b = BootRecorderPlugin(identifier: "b")
         let c = BootRecorderPlugin(identifier: "c")
@@ -60,7 +60,7 @@ struct TopologicalSortTests {
     @Test("sorts plugins respecting dependencies")
     func withDependencies() throws {
         resetForTest()
-        let kernel = AuraKernel()
+        let kernel = AuraKernelBase()
         let db = BootRecorderPlugin(identifier: "db")
         let net = BootRecorderPlugin(identifier: "net", dependencies: ["db"])
         let feature = BootRecorderPlugin(identifier: "feature", dependencies: ["db", "net"])
@@ -78,7 +78,7 @@ struct TopologicalSortTests {
     @Test("handles diamond dependency — siblings may be in any order")
     func diamondDependency() throws {
         resetForTest()
-        let kernel = AuraKernel()
+        let kernel = AuraKernelBase()
         let a = BootRecorderPlugin(identifier: "a")
         let b = BootRecorderPlugin(identifier: "b", dependencies: ["a"])
         let c = BootRecorderPlugin(identifier: "c", dependencies: ["a"])
@@ -98,7 +98,7 @@ struct TopologicalSortTests {
     @Test("throws on missing dependency")
     func missingDependency() {
         resetForTest()
-        let kernel = AuraKernel()
+        let kernel = AuraKernelBase()
         kernel.register(BootRecorderPlugin(identifier: "a", dependencies: ["nonexistent"]))
 
         #expect(throws: AuraKernelError.missingDependency(plugin: "a", dependency: "nonexistent")) {
@@ -109,7 +109,7 @@ struct TopologicalSortTests {
     @Test("throws on cycle")
     func cycleDetection() {
         resetForTest()
-        let kernel = AuraKernel()
+        let kernel = AuraKernelBase()
         kernel.register(BootRecorderPlugin(identifier: "a", dependencies: ["b"]))
         kernel.register(BootRecorderPlugin(identifier: "b", dependencies: ["a"]))
 
@@ -128,7 +128,7 @@ struct KernelBootTests {
     @Test("calls boot in dependency order")
     func bootOrder() throws {
         resetForTest()
-        let kernel = AuraKernel()
+        let kernel = AuraKernelBase()
         let db = BootRecorderPlugin(identifier: "db")
         let net = BootRecorderPlugin(identifier: "net", dependencies: ["db"])
         let feature = BootRecorderPlugin(identifier: "feature", dependencies: ["db", "net"])
@@ -146,7 +146,7 @@ struct KernelBootTests {
     @Test("boot calls boot(kernel:) each time — not idempotent")
     func bootCalledEachTime() throws {
         resetForTest()
-        let kernel = AuraKernel()
+        let kernel = AuraKernelBase()
         let plugin = BootRecorderPlugin(identifier: "p")
 
         kernel.register(plugin)
@@ -160,10 +160,10 @@ struct KernelBootTests {
     @Test("boot sets shared singleton")
     func bootSetsShared() throws {
         resetForTest()
-        let kernel = AuraKernel()
+        let kernel = AuraKernelBase()
         try kernel.boot()
 
-        #expect(AuraKernel.shared === kernel)
+        #expect(AuraKernelBase.shared === kernel)
     }
 }
 
@@ -176,7 +176,7 @@ struct RegistrationTests {
     @Test("unregister removes plugin by identity")
     func unregister() {
         resetForTest()
-        let kernel = AuraKernel()
+        let kernel = AuraKernelBase()
         let plugin = BootRecorderPlugin(identifier: "p")
         kernel.register(plugin)
         #expect(kernel.pluginList.count == 1)
@@ -188,7 +188,7 @@ struct RegistrationTests {
     @Test("reset clears all plugins")
     func reset() {
         resetForTest()
-        let kernel = AuraKernel()
+        let kernel = AuraKernelBase()
         kernel.register(BootRecorderPlugin(identifier: "a"))
         kernel.register(BootRecorderPlugin(identifier: "b"))
         #expect(kernel.pluginList.count == 2)
@@ -200,8 +200,8 @@ struct RegistrationTests {
     @Test("each kernel instance has its own plugins")
     func instanceIsolation() {
         resetForTest()
-        let kernel1 = AuraKernel()
-        let kernel2 = AuraKernel()
+        let kernel1 = AuraKernelBase()
+        let kernel2 = AuraKernelBase()
         let plugin = BootRecorderPlugin(identifier: "p")
 
         kernel1.register(plugin)

@@ -21,7 +21,7 @@ import UIKit
 /// }
 /// ```
 @MainActor
-open class AuraAppKernel: AuraKernel, UIApplicationDelegate {
+open class AuraAppKernel: AuraKernelBase, UIApplicationDelegate {
 
     // MARK: - UIApplicationDelegate Forwarding
 
