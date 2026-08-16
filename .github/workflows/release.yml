@@ -3,6 +3,12 @@ name: Release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. v2.1.0). Leave empty to bump from the latest commit message.'
+        required: false
+        default: ''
 
 concurrency:
   group: release-${{ github.ref }}
@@ -20,13 +26,21 @@ jobs:
         with:
           fetch-depth: 0   # need full history for git describe (latest tag)
 
-      - name: Determine version from commit message
+      - name: Determine version
         id: version
         run: |
-          MSG="${{ github.event.head_commit.message }}"
-          VERSION="$(bash scripts/bump_version.sh "$MSG")"
-          echo "commit message: $MSG"
-          echo "bump result: $VERSION"
+          MANUAL="${{ github.event.inputs.version }}"
+          if [[ -n "$MANUAL" ]]; then
+            # Manual dispatch: use the provided version verbatim.
+            VERSION="$MANUAL"
+            echo "manual version: $VERSION"
+          else
+            # Push: bump from the latest commit message.
+            MSG="${{ github.event.head_commit.message }}"
+            VERSION="$(bash scripts/bump_version.sh "$MSG")"
+            echo "commit message: $MSG"
+            echo "bump result: $VERSION"
+          fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Skip if no bump prefix
