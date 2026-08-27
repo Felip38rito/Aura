@@ -32,6 +32,8 @@ private struct SUIComponentView: View {
     let theme: AuraTheme
     let onAction: @Sendable (AuraComponentAction) -> Void
 
+    @Environment(\.spacingResolver) private var spacingResolver
+
     var body: some View {
         switch component {
         case .heading(_, let data):
@@ -93,7 +95,7 @@ private struct SUIComponentView: View {
 
     private func resolvePadding(_ token: String?) -> CGFloat {
         guard let token else { return 0 }
-        return AuraSpacingResolver.default.resolve(AuraSpacingToken(rawValue: token) ?? .md)
+        return spacingResolver.resolve(AuraSpacingToken(rawValue: token) ?? .md)
     }
 }
 
