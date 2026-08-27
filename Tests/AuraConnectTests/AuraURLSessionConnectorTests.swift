@@ -5,7 +5,7 @@ import Foundation
 // MARK: - Mock URLProtocol
 
 private final class MockURLProtocol: URLProtocol {
-    nonisolated(unsafe) static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
+    nonisolated(unsafe) static var requestHandler: ((URLRequest) throws -> (URLResponse, Data))?
 
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
@@ -176,5 +176,75 @@ struct AuraURLSessionConnectorTests {
 
         let response = try await connector.request(request)
         #expect(response.statusCode == 200)
+    }
+
+    @Test func testDownloadSuccess() async throws {
+        let expectedData = #"{"file": "content"}"#.data(using: .utf8)!
+        MockURLProtocol.requestHandler = { _ in
+            let response = HTTPURLResponse(
+                url: URL(string: "https://aura.ai")!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+            return (response, expectedData)
+        }
+        defer { MockURLProtocol.requestHandler = nil }
+
+        let connector = AuraURLSessionConnector(session: makeSession())
+        let request = AuraHTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
+
+        let (localURL, response) = try await connector.download(request)
+
+        #expect(response.statusCode == 200)
+        #expect(response.body == expectedData)
+        // URLSession writes the downloaded bytes to a temp file it owns.
+        #expect(FileManager.default.fileExists(atPath: localURL.path))
+    }
+
+    @Test func testDownloadAppliesAfterMiddleware() async throws {
+        let expectedData = Data()
+        MockURLProtocol.requestHandler = { _ in
+            let response = HTTPURLResponse(
+                url: URL(string: "https://aura.ai")!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+            return (response, expectedData)
+        }
+        defer { MockURLProtocol.requestHandler = nil }
+
+        let middleware = StatusMiddleware(newStatus: 206)
+        let connector = AuraURLSessionConnector(
+            session: makeSession(),
+            middlewares: [middleware]
+        )
+        let request = AuraHTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
+
+        let (_, response) = try await connector.download(request)
+
+        #expect(response.statusCode == 206)
+    }
+
+    @Test func testRequestThrowsInvalidResponseForNonHTTPResponse() async {
+        MockURLProtocol.requestHandler = { _ in
+            // A non-HTTP response (e.g. a file:// URL) is not an HTTPURLResponse.
+            let response = URLResponse(
+                url: URL(string: "https://aura.ai")!,
+                mimeType: nil,
+                expectedContentLength: 0,
+                textEncodingName: nil
+            )
+            return (response, Data())
+        }
+        defer { MockURLProtocol.requestHandler = nil }
+
+        let connector = AuraURLSessionConnector(session: makeSession())
+        let request = AuraHTTPRequest(method: .get, url: URL(string: "https://aura.ai")!)
+
+        await #expect(throws: AuraURLSessionConnector.AuraHTTPError.invalidResponse) {
+            try await connector.request(request)
+        }
     }
 }
