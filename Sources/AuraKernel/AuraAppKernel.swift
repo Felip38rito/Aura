@@ -105,19 +105,35 @@ open class AuraAppKernel: AuraKernelBase, UIApplicationDelegate {
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
     ) {
+        let plugins = pluginList
+        guard !plugins.isEmpty else {
+            completionHandler(.noData)
+            return
+        }
+
         var finalResult: UIBackgroundFetchResult = .noData
-        for plugin in pluginList {
+        var pending = plugins.count
+
+        for plugin in plugins {
             plugin.application(
                 application,
                 didReceiveRemoteNotification: userInfo,
                 fetchCompletionHandler: { result in
-                    if result.rawValue < finalResult.rawValue {
-                        finalResult = result
+                    // Plugins may invoke their handler asynchronously and from any
+                    // thread, so aggregate on the main actor before completing.
+                    Task { @MainActor in
+                        // Lower rawValue wins: .newData < .noData < .failed
+                        if result.rawValue < finalResult.rawValue {
+                            finalResult = result
+                        }
+                        pending -= 1
+                        if pending == 0 {
+                            completionHandler(finalResult)
+                        }
                     }
                 }
             )
         }
-        completionHandler(finalResult)
     }
 }
 
