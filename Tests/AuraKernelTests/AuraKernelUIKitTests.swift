@@ -9,7 +9,7 @@ final class LifecycleRecorderPlugin: AuraKernelPlugin {
     let identifier = "lifecycle-recorder"
     var events: [String] = []
 
-    func boot(kernel: AuraKernel) {
+    func boot(kernel: AuraKernelBase) {
         events.append("boot")
     }
 
@@ -39,6 +39,15 @@ final class LaunchResultPlugin: AuraKernelPlugin {
         didFinishLaunchingWithOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         shouldReturn
+    }
+}
+
+final class HandoffRecorderPlugin: AuraKernelPlugin {
+    let identifier = "handoff-recorder"
+    var continuedActivities: [NSUserActivity] = []
+
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        continuedActivities.append(userActivity)
     }
 }
 
@@ -88,9 +97,30 @@ struct AppKernelLifecycleTests {
 
 // MARK: - AuraSceneKernel Lifecycle Forwarding Tests
 //
-// NOTE: The scene lifecycle forwarding (scene(_:willConnectTo:options:)) is not
-// unit-tested here because UISceneSession and UIScene.ConnectionOptions have no
-// public initializers, so the arguments cannot be constructed in a test. The
-// forwarding logic is exercised indirectly via the AuraExample app.
+// NOTE: Most scene lifecycle forwarding (scene(_:willConnectTo:options:),
+// sceneDidBecomeActive, etc.) is not unit-tested here because UISceneSession
+// and UIScene.ConnectionOptions have no public initializers, so the arguments
+// cannot be constructed in a test. The forwarding logic is exercised indirectly
+// via the AuraExample app. The Handoff path (scene(_:continue:)) is testable
+// because NSUserActivity has a public initializer.
+
+@Suite("AuraSceneKernel Lifecycle Forwarding")
+@MainActor
+struct SceneKernelLifecycleTests {
+
+    @Test("forwards scene(_:continue:) to all plugins")
+    func forwardsContinueUserActivity() throws {
+        let kernel = AuraSceneKernel()
+        let plugin = HandoffRecorderPlugin()
+        kernel.register(plugin)
+        try kernel.boot()
+
+        let activity = NSUserActivity(activityType: "com.aura.example.handoff")
+        kernel.scene(UIWindowScene(), continue: activity)
+
+        #expect(plugin.continuedActivities.count == 1)
+        #expect(plugin.continuedActivities.first?.activityType == "com.aura.example.handoff")
+    }
+}
 
 #endif

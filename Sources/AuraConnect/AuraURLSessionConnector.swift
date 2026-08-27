@@ -3,10 +3,10 @@ import Foundation
 public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
     public enum AuraHTTPError: Error, Sendable {
         case invalidResponse
-        case networkError(Error)
     }
 
     private let session: URLSession
+    private let middlewaresLock = NSLock()
     private var middlewares: [AuraConnectorMiddleware]
 
     public init(
@@ -18,10 +18,21 @@ public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
     }
 
     public func register(_ middleware: AuraConnectorMiddleware) {
+        middlewaresLock.lock()
         middlewares.append(middleware)
+        middlewaresLock.unlock()
+    }
+
+    /// A snapshot of the current middleware chain, taken under the lock so
+    /// concurrent `register(_:)` calls never race with iteration.
+    private func snapshotMiddlewares() -> [AuraConnectorMiddleware] {
+        middlewaresLock.lock()
+        defer { middlewaresLock.unlock() }
+        return middlewares
     }
 
     public func request(_ request: AuraHTTPRequest) async throws -> AuraHTTPResponse {
+        let middlewares = snapshotMiddlewares()
         var currentRequest = request
         for middleware in middlewares {
             currentRequest = try await middleware.before(request: currentRequest)
@@ -36,7 +47,7 @@ public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
 
         var currentResponse = AuraHTTPResponse(
             statusCode: httpResponse.statusCode,
-            headers: httpResponse.allHeaderFields as? [String: String] ?? [:],
+            headers: Self.stringHeaders(from: httpResponse.allHeaderFields),
             body: data
         )
 
@@ -48,6 +59,7 @@ public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
     }
 
     public func download(_ request: AuraHTTPRequest) async throws -> (URL, AuraHTTPResponse) {
+        let middlewares = snapshotMiddlewares()
         var currentRequest = request
         for middleware in middlewares {
             currentRequest = try await middleware.before(request: currentRequest)
@@ -62,7 +74,7 @@ public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
 
         var currentResponse = AuraHTTPResponse(
             statusCode: httpResponse.statusCode,
-            headers: httpResponse.allHeaderFields as? [String: String] ?? [:],
+            headers: Self.stringHeaders(from: httpResponse.allHeaderFields),
             body: try Data(contentsOf: localURL)
         )
 
@@ -71,6 +83,19 @@ public final class AuraURLSessionConnector: @unchecked Sendable, AuraConnector {
         }
 
         return (localURL, currentResponse)
+    }
+
+    /// Converts `URLSession`'s `[AnyHashable: Any]` header dictionary into a
+    /// `[String: String]` dictionary, preserving only string values instead of
+    /// silently dropping all headers when the cast fails.
+    private static func stringHeaders(from allHeaderFields: [AnyHashable: Any]) -> [String: String] {
+        var headers: [String: String] = [:]
+        for (key, value) in allHeaderFields {
+            if let key = key as? String, let value = value as? String {
+                headers[key] = value
+            }
+        }
+        return headers
     }
 
     private func buildURLRequest(from request: AuraHTTPRequest) throws -> URLRequest {
